@@ -1,0 +1,65 @@
+name: Validate Data
+
+on:
+  push:
+    paths:
+      - 'data/**'
+  pull_request:
+    paths:
+      - 'data/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate manifest.json
+        run: |
+          echo "Validating manifest.json..."
+          if [ ! -f data/manifest.json ]; then
+            echo "Error: manifest.json not found"
+            exit 1
+          fi
+
+          # Check JSON validity
+          python3 -c "import json; json.load(open('data/manifest.json'))"
+          echo "manifest.json is valid JSON"
+
+          # Check required fields
+          python3 -c "
+          import json
+          with open('data/manifest.json') as f:
+              m = json.load(f)
+
+          required = ['version', 'last_updated', 'products', 'specials']
+          for field in required:
+              if field not in m:
+                  raise ValueError(f'Missing required field: {field}')
+
+          print('All required fields present')
+          print(f'Last updated: {m[\"last_updated\"]}')
+          print(f'Products: {sum(s[\"count\"] for s in m[\"products\"].values())} total')
+          print(f'Specials: {sum(s[\"count\"] for s in m[\"specials\"].values())} total')
+          "
+
+      - name: Check data files exist
+        run: |
+          echo "Checking data files..."
+
+          # Check products directories
+          for store in woolworths coles aldi; do
+            if [ -d "data/products/$store" ]; then
+              count=$(find "data/products/$store" -name "*.json.gz" | wc -l)
+              echo "  $store: $count product files"
+            fi
+          done
+
+          # Check specials files
+          for store in woolworths coles; do
+            if [ -f "data/specials/$store.json.gz" ]; then
+              echo "  $store specials: exists"
+            fi
+          done
+
+          echo "Data validation complete"

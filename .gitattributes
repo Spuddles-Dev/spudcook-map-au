@@ -1,0 +1,11 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Images - consider Git LFS for large repos
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+
+# JSON data files
+*.json text

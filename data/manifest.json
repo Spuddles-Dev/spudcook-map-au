@@ -1,0 +1,70 @@
+{
+  "version": "202604180000",
+  "lastUpdated": "2026-04-18T15:21:45.731803Z",
+  "state": "NSW",
+  "format": {
+    "compressed": true,
+    "by_category": false
+  },
+  "stores": [
+    {
+      "storeCode": "woolies",
+      "storeName": "Woolworths",
+      "productsFile": {
+        "url": "data/products/woolworths.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "referencePricesFile": {
+        "url": "data/reference-prices/woolworths.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "specialsFile": {
+        "url": "data/specials/woolworths.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "productCount": 60330,
+      "specialsCount": 2361
+    },
+    {
+      "storeCode": "coles",
+      "storeName": "Coles",
+      "productsFile": {
+        "url": "data/products/coles.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "referencePricesFile": {
+        "url": "data/reference-prices/coles.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "specialsFile": {
+        "url": "data/specials/coles.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "productCount": 56616,
+      "specialsCount": 2304
+    },
+    {
+      "storeCode": "aldi",
+      "storeName": "Aldi",
+      "productsFile": {
+        "url": "data/products/aldi.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "referencePricesFile": {
+        "url": "data/reference-prices/aldi.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-18"
+      },
+      "specialsFile": null,
+      "productCount": 11232,
+      "specialsCount": 0
+    }
+  ]
+}
