@@ -1,6 +1,6 @@
 {
-  "version": "202604180000",
-  "lastUpdated": "2026-04-18T15:21:45.731803Z",
+  "version": "202604280000",
+  "lastUpdated": "2026-04-28T11:56:09.495903Z",
   "state": "NSW",
   "format": {
     "compressed": true,
@@ -13,20 +13,20 @@
       "productsFile": {
         "url": "data/products/woolworths.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "referencePricesFile": {
         "url": "data/reference-prices/woolworths.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "specialsFile": {
         "url": "data/specials/woolworths.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
-      "productCount": 60330,
-      "specialsCount": 2361
+      "productCount": 44495,
+      "specialsCount": 1753
     },
     {
       "storeCode": "coles",
@@ -34,20 +34,20 @@
       "productsFile": {
         "url": "data/products/coles.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "referencePricesFile": {
         "url": "data/reference-prices/coles.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "specialsFile": {
         "url": "data/specials/coles.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
-      "productCount": 56616,
-      "specialsCount": 2304
+      "productCount": 37964,
+      "specialsCount": 2259
     },
     {
       "storeCode": "aldi",
@@ -55,15 +55,45 @@
       "productsFile": {
         "url": "data/products/aldi.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "referencePricesFile": {
         "url": "data/reference-prices/aldi.json.gz",
         "sizeBytes": 0,
-        "lastModified": "2026-04-18"
+        "lastModified": "2026-04-28"
       },
       "specialsFile": null,
-      "productCount": 11232,
+      "productCount": 10421,
+      "specialsCount": 0
+    },
+    {
+      "storeCode": "iga",
+      "storeName": "Iga",
+      "productsFile": {
+        "url": "data/products/iga.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-28"
+      },
+      "referencePricesFile": {
+        "url": "data/reference-prices/iga.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-28"
+      },
+      "specialsFile": null,
+      "productCount": 30039,
+      "specialsCount": 0
+    },
+    {
+      "storeCode": "drakes",
+      "storeName": "Drakes",
+      "productsFile": null,
+      "referencePricesFile": {
+        "url": "data/reference-prices/drakes.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-28"
+      },
+      "specialsFile": null,
+      "productCount": 0,
       "specialsCount": 0
     }
   ]
