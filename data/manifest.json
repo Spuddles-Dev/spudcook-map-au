@@ -1,6 +1,6 @@
 {
   "version": "202604280000",
-  "lastUpdated": "2026-04-28T11:56:09.495903Z",
+  "lastUpdated": "2026-04-28T11:59:27.097962Z",
   "state": "NSW",
   "format": {
     "compressed": true,
@@ -25,7 +25,7 @@
         "sizeBytes": 0,
         "lastModified": "2026-04-28"
       },
-      "productCount": 44495,
+      "productCount": 9968,
       "specialsCount": 1753
     },
     {
@@ -46,7 +46,7 @@
         "sizeBytes": 0,
         "lastModified": "2026-04-28"
       },
-      "productCount": 37964,
+      "productCount": 11292,
       "specialsCount": 2259
     },
     {
@@ -63,7 +63,7 @@
         "lastModified": "2026-04-28"
       },
       "specialsFile": null,
-      "productCount": 10421,
+      "productCount": 2141,
       "specialsCount": 0
     },
     {
@@ -80,20 +80,24 @@
         "lastModified": "2026-04-28"
       },
       "specialsFile": null,
-      "productCount": 30039,
+      "productCount": 10046,
       "specialsCount": 0
     },
     {
       "storeCode": "drakes",
       "storeName": "Drakes",
-      "productsFile": null,
+      "productsFile": {
+        "url": "data/products/drakes.json.gz",
+        "sizeBytes": 0,
+        "lastModified": "2026-04-28"
+      },
       "referencePricesFile": {
         "url": "data/reference-prices/drakes.json.gz",
         "sizeBytes": 0,
         "lastModified": "2026-04-28"
       },
       "specialsFile": null,
-      "productCount": 0,
+      "productCount": 14022,
       "specialsCount": 0
     }
   ]
