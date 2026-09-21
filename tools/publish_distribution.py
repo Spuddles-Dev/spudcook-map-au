@@ -52,6 +52,23 @@ def verify_release(release, expected):
         )
 
 
+def find_release(tag):
+    release = api("releases/tags/" + tag, missing=True)
+    if release is not None:
+        return release
+    # GitHub's release-by-tag endpoint omits drafts. Authenticated list/read-by-ID
+    # endpoints include them, so a failed upload can resume the existing draft.
+    for page in range(1, 101):
+        rows = api(f"releases?per_page=100&page={page}")
+        matching = [row for row in rows if row["tag_name"] == tag]
+        require(len(matching) <= 1, "Multiple drafts have the same data tag")
+        if matching:
+            return matching[0]
+        if len(rows) < 100:
+            return None
+    raise ValueError("Release discovery exceeded its bounded page budget")
+
+
 def verify_tagged_files(tag, index_path, index):
     tree = api("git/trees/" + tag + "?recursive=1")
     require(not tree.get("truncated"), "Cannot verify a truncated Git tree")
@@ -140,7 +157,7 @@ def publish(index_path):
     require(len(sha) == 40, "Expected an exact checked commit")
     expected = {a["path"]: (a["byte_length"], a["sha256"]) for a in assets(index)}
     expected["catalogue-release.json"] = (len(raw), hashlib.sha256(raw).hexdigest())
-    release = api("releases/tags/" + tag, missing=True)
+    release = find_release(tag)
     if release is None:
         existing_tag = api("git/ref/tags/" + tag, missing=True)
         if existing_tag is None:
@@ -168,7 +185,12 @@ def publish(index_path):
                 "--notes-file",
                 str(notes),
             )
-        release = api("releases/tags/" + tag)
+        release = find_release(tag)
+        require(
+            release is not None,
+            "Created draft is not readable; pointer was not advanced",
+        )
+    release_path = "releases/" + str(release["id"])
     if release["draft"]:
         existing = {a["name"]: a for a in release["assets"]}
         require(set(existing) <= set(expected), "Unexpected draft assets")
@@ -189,7 +211,7 @@ def publish(index_path):
                     else index_path.parent / name
                 )
                 command("gh", "release", "upload", tag, str(path), "--repo", REPOSITORY)
-        verify_release(api("releases/tags/" + tag), expected)
+        verify_release(api(release_path), expected)
         verify_tagged_files(tag, index_path, index)
         command(
             "gh",
@@ -201,7 +223,7 @@ def publish(index_path):
             "--draft=false",
             "--latest",
         )
-    release = api("releases/tags/" + tag)
+    release = api(release_path)
     require(
         not release["draft"] and not release["prerelease"],
         "Current pointer requires a published data release",

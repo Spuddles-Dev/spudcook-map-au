@@ -72,6 +72,8 @@ class PublicationTests(unittest.TestCase):
         self.index = validate(self.index_path)
         self.raw = self.index_path.read_bytes()
         self.release = {
+            "id": 123,
+            "tag_name": self.index["release_tag"],
             "draft": False,
             "prerelease": False,
             "assets": [
@@ -256,7 +258,7 @@ class PublicationTests(unittest.TestCase):
         broken["tree"][0]["sha"] = "0" * 40
         with (
             patch.object(
-                publish_distribution, "api", side_effect=[draft, draft, broken]
+                publish_distribution, "api", side_effect=[None, [draft], draft, broken]
             ),
             patch.object(publish_distribution, "command") as command,
         ):
@@ -265,12 +267,32 @@ class PublicationTests(unittest.TestCase):
                 publish_distribution.publish(self.index_path)
             self.assertEqual(command.call_count, 1)
 
-    def _complete_draft(self, orphan=False):
-        state = {"release": None, "uploaded": [], "pointer": False, "tagged": orphan}
+    def _complete_draft(self, orphan=False, resume=False):
+        state = {
+            "release": None,
+            "uploaded": [],
+            "pointer": False,
+            "tagged": orphan or resume,
+        }
+        if resume:
+            state["release"] = {
+                "id": 123,
+                "tag_name": self.index["release_tag"],
+                "draft": True,
+                "prerelease": False,
+                "assets": [],
+            }
         expected = {row["name"]: row for row in self.release["assets"]}
 
         def api(path, *, body=None, missing=False, method="POST", conflict=False):
             if path.startswith("releases/tags/"):
+                release = state["release"]
+                return (
+                    copy.deepcopy(release) if release and not release["draft"] else None
+                )
+            if path.startswith("releases?per_page="):
+                return [copy.deepcopy(state["release"])] if state["release"] else []
+            if path == "releases/123":
                 return copy.deepcopy(state["release"])
             if path.startswith("git/ref/tags/"):
                 return (
@@ -311,8 +333,17 @@ class PublicationTests(unittest.TestCase):
 
         def command(*args, **kwargs):
             if args[:3] == ("gh", "release", "create"):
+                self.assertFalse(
+                    resume, "A draft omitted by the tag endpoint must be resumed"
+                )
                 self.assertTrue(state["tagged"])
-                state["release"] = {"draft": True, "prerelease": False, "assets": []}
+                state["release"] = {
+                    "id": 123,
+                    "tag_name": self.index["release_tag"],
+                    "draft": True,
+                    "prerelease": False,
+                    "assets": [],
+                }
             elif args[:3] == ("gh", "release", "upload"):
                 path = Path(args[4])
                 raw = path.read_bytes()
@@ -344,6 +375,25 @@ class PublicationTests(unittest.TestCase):
     def test_orphan_tag_from_earlier_commit_is_reused_with_exact_verified_bytes(self):
         self._complete_draft(orphan=True)
 
+    def test_existing_draft_omitted_by_tag_endpoint_is_resumed_using_stable_id(self):
+        self._complete_draft(resume=True)
+
+    def test_draft_discovery_paginates_when_older_than_first_list_page(self):
+        draft = {**self.release, "draft": True}
+        with patch.object(
+            publish_distribution,
+            "api",
+            side_effect=[
+                None,
+                [{"tag_name": "other"}] * 100,
+                [draft],
+            ],
+        ) as api:
+            self.assertEqual(
+                publish_distribution.find_release(self.index["release_tag"]), draft
+            )
+        self.assertEqual(api.call_args_list[-1].args[0], "releases?per_page=100&page=2")
+
     def test_orphan_tag_with_changed_bytes_is_not_reused_or_moved(self):
         for row in self.tree["tree"]:
             with self.subTest(path=row["path"]):
@@ -357,6 +407,7 @@ class PublicationTests(unittest.TestCase):
                         "api",
                         side_effect=[
                             None,
+                            [],
                             {"object": {"type": "commit", "sha": "c" * 40}},
                             broken,
                         ],
