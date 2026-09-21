@@ -11,7 +11,7 @@ from feed_integrity import (
     vendor_price_revision,
 )
 from jsonschema import Draft202012Validator, FormatChecker
-from validate_distribution import ROOT, metadata, pages, prices, require
+from validate_distribution import ROOT, metadata, metadata_delta, pages, prices, require
 
 VENDORS = ("aldi", "coles", "drakes", "iga", "woolies")
 STATES = {"ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"}
@@ -106,9 +106,11 @@ def validate(index_path, schema_path=ROOT / "schema/catalogue-distribution-v2.js
                 ),
                 "Food delta targets a different snapshot",
             )
-            metadata(
+            metadata_delta(
                 index["delta"],
                 pages(directory, index["delta"]["archive"], validators["catalogue_page"]),
+                index["snapshot"],
+                content,
             )
     else:
         require(

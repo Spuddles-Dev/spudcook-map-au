@@ -60,8 +60,30 @@ def find_release(tag):
         if matching:
             return matching[0]
         if len(rows) < 100:
-            return None
-    raise ValueError("Release discovery exceeded its bounded page budget")
+            break
+    else:
+        raise ValueError("Release discovery exceeded its bounded page budget")
+    # The CLI's authenticated release lookup can discover drafts that are not
+    # yet visible in the REST tag/list indexes used by an Actions token.
+    lookup = command(
+        "gh",
+        "release",
+        "view",
+        tag,
+        "--repo",
+        REPOSITORY,
+        "--json",
+        "databaseId,tagName",
+        check=False,
+    )
+    if lookup.returncode == 0:
+        identity = json.loads(lookup.stdout)
+        require(
+            identity.get("tagName") == tag and isinstance(identity.get("databaseId"), int),
+            "Draft discovery returned another release",
+        )
+        return api("releases/" + str(identity["databaseId"]))
+    return None
 
 
 def verify_tagged_files(
@@ -198,30 +220,23 @@ def publish(
         # An interrupted run may have tagged an earlier source commit with
         # identical data. Verify its bytes, never move or replace that tag.
         verify_tag()
-        with tempfile.TemporaryDirectory() as directory:
-            notes = Path(directory) / "notes.md"
-            notes.write_text(
-                "Public Australian food catalogue and explicit state/chain price snapshots.\n\nValidated ZIP and typed-page SHA256 checksums. No personal data or automatic food-review approvals.\n",
-                encoding="utf-8",
-            )
-            command(
-                "gh",
-                "release",
-                "create",
-                tag,
-                "--repo",
-                REPOSITORY,
-                "--verify-tag",
-                "--draft",
-                "--title",
-                tag,
-                "--notes-file",
-                str(notes),
-            )
-        release = find_release(tag)
+        release = api(
+            "releases",
+            body={
+                "tag_name": tag,
+                "target_commitish": sha,
+                "name": tag,
+                "draft": True,
+                "prerelease": False,
+                "make_latest": "false",
+                "body": "Public Australian food catalogue and explicit state/chain price snapshots.\n\nValidated ZIP and typed-page SHA256 checksums. No personal data or automatic food-review approvals.\n",
+            },
+        )
         require(
-            release is not None,
-            "Created draft is not readable; pointer was not advanced",
+            release.get("tag_name") == tag
+            and release.get("draft") is True
+            and isinstance(release.get("id"), int),
+            "Draft creation returned an unexpected identity; pointer was not advanced",
         )
     release_path = "releases/" + str(release["id"])
     if release["draft"]:

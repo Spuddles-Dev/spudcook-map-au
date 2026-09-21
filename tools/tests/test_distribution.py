@@ -118,9 +118,7 @@ class PublicationTests(unittest.TestCase):
             command.return_value.stdout = "a" * 40
             with self.assertRaisesRegex(ValueError, "incomplete"):
                 publish_distribution.publish(self.index_path)
-            self.assertFalse(
-                any("contents/" in call.args[0] for call in api.call_args_list)
-            )
+            self.assertFalse(any("contents/" in call.args[0] for call in api.call_args_list))
             self.assertEqual(command.call_count, 1)
 
     def test_newer_candidate_does_not_get_older_pointer(self):
@@ -184,9 +182,7 @@ class PublicationTests(unittest.TestCase):
             ],
         )
         self.assertEqual(calls[9].kwargs["body"]["parents"], [head])
-        self.assertEqual(
-            calls[10].kwargs["body"], {"sha": "pointer-commit", "force": False}
-        )
+        self.assertEqual(calls[10].kwargs["body"], {"sha": "pointer-commit", "force": False})
         self.assertEqual(calls[10].kwargs["method"], "PATCH")
 
     def test_concurrent_new_candidate_rejects_pointer_even_when_pointer_file_is_unchanged(
@@ -205,15 +201,11 @@ class PublicationTests(unittest.TestCase):
             {"object": {"sha": "c" * 40}},
         ]
         with patch.object(publish_distribution, "api", side_effect=replies) as api:
-            result = publish_distribution.advance_pointer(
-                self.index["release_tag"], self.raw
-            )
+            result = publish_distribution.advance_pointer(self.index["release_tag"], self.raw)
         self.assertFalse(result["pointer_advanced"])
         self.assertEqual(result["reason"], "main_changed_during_publication")
         self.assertEqual(api.call_args_list[6].kwargs["body"]["parents"], [head])
-        writes = [
-            call for call in api.call_args_list if call.args[0] == "git/refs/heads/main"
-        ]
+        writes = [call for call in api.call_args_list if call.args[0] == "git/refs/heads/main"]
         self.assertEqual(len(writes), 1)
         self.assertFalse(writes[0].kwargs["body"]["force"])
 
@@ -231,9 +223,7 @@ class PublicationTests(unittest.TestCase):
                 )
             )
             with self.assertRaises(RuntimeError):
-                publish_distribution.api(
-                    "git/refs", body={"ref": "refs/tags/data-v1-test"}
-                )
+                publish_distribution.api("git/refs", body={"ref": "refs/tags/data-v1-test"})
 
     def test_tagged_raw_bytes_must_match_release_assets(self):
         broken = copy.deepcopy(self.tree)
@@ -257,9 +247,7 @@ class PublicationTests(unittest.TestCase):
         broken = copy.deepcopy(self.tree)
         broken["tree"][0]["sha"] = "0" * 40
         with (
-            patch.object(
-                publish_distribution, "api", side_effect=[None, [draft], draft, broken]
-            ),
+            patch.object(publish_distribution, "api", side_effect=[None, [draft], draft, broken]),
             patch.object(publish_distribution, "command") as command,
         ):
             command.return_value.stdout = "a" * 40
@@ -285,19 +273,27 @@ class PublicationTests(unittest.TestCase):
         expected = {row["name"]: row for row in self.release["assets"]}
 
         def api(path, *, body=None, missing=False, method="POST", conflict=False):
+            if path == "releases" and body:
+                self.assertFalse(resume, "Existing drafts must be resumed")
+                self.assertTrue(state["tagged"])
+                self.assertTrue(body["draft"])
+                state["release"] = {
+                    "id": 123,
+                    "tag_name": self.index["release_tag"],
+                    "draft": True,
+                    "prerelease": False,
+                    "assets": [],
+                }
+                return copy.deepcopy(state["release"])
             if path.startswith("releases/tags/"):
                 release = state["release"]
-                return (
-                    copy.deepcopy(release) if release and not release["draft"] else None
-                )
+                return copy.deepcopy(release) if release and not release["draft"] else None
             if path.startswith("releases?per_page="):
                 return [copy.deepcopy(state["release"])] if state["release"] else []
             if path == "releases/123":
                 return copy.deepcopy(state["release"])
             if path.startswith("git/ref/tags/"):
-                return (
-                    {"object": {"type": "commit", "sha": "c" * 40}} if orphan else None
-                )
+                return {"object": {"type": "commit", "sha": "c" * 40}} if orphan else None
             if path == "git/refs":
                 self.assertFalse(orphan, "Existing orphan tag must not be replaced")
                 self.assertEqual(body["sha"], "a" * 40)
@@ -332,19 +328,9 @@ class PublicationTests(unittest.TestCase):
             self.fail("Unexpected API operation")
 
         def command(*args, **kwargs):
-            if args[:3] == ("gh", "release", "create"):
-                self.assertFalse(
-                    resume, "A draft omitted by the tag endpoint must be resumed"
-                )
-                self.assertTrue(state["tagged"])
-                state["release"] = {
-                    "id": 123,
-                    "tag_name": self.index["release_tag"],
-                    "draft": True,
-                    "prerelease": False,
-                    "assets": [],
-                }
-            elif args[:3] == ("gh", "release", "upload"):
+            if args[:3] == ("gh", "release", "view"):
+                return SimpleNamespace(returncode=1, stdout="")
+            if args[:3] == ("gh", "release", "upload"):
                 path = Path(args[4])
                 raw = path.read_bytes()
                 row = {
@@ -365,9 +351,7 @@ class PublicationTests(unittest.TestCase):
             patch.object(publish_distribution, "command", side_effect=command),
         ):
             result = publish_distribution.publish(self.index_path)
-        self.assertTrue(
-            result["published"] and result["pointer_advanced"] and state["pointer"]
-        )
+        self.assertTrue(result["published"] and result["pointer_advanced"] and state["pointer"])
 
     def test_draft_is_completed_and_verified_before_public_pointer(self):
         self._complete_draft()
@@ -389,18 +373,33 @@ class PublicationTests(unittest.TestCase):
                 [draft],
             ],
         ) as api:
-            self.assertEqual(
-                publish_distribution.find_release(self.index["release_tag"]), draft
-            )
+            self.assertEqual(publish_distribution.find_release(self.index["release_tag"]), draft)
         self.assertEqual(api.call_args_list[-1].args[0], "releases?per_page=100&page=2")
+
+    def test_cli_discovery_resumes_draft_when_rest_indexes_lag(self):
+        tag = self.index["release_tag"]
+        draft = {**self.release, "draft": True}
+        with (
+            patch.object(publish_distribution, "api", side_effect=[None, [], draft]) as api,
+            patch.object(
+                publish_distribution,
+                "command",
+                return_value=SimpleNamespace(
+                    returncode=0,
+                    stdout=json.dumps({"databaseId": 123, "tagName": tag}),
+                ),
+            ),
+        ):
+            self.assertEqual(publish_distribution.find_release(tag), draft)
+        self.assertEqual(api.call_args_list[-1].args[0], "releases/123")
 
     def test_orphan_tag_with_changed_bytes_is_not_reused_or_moved(self):
         for row in self.tree["tree"]:
             with self.subTest(path=row["path"]):
                 broken = copy.deepcopy(self.tree)
-                next(item for item in broken["tree"] if item["path"] == row["path"])[
-                    "sha"
-                ] = "0" * 40
+                next(item for item in broken["tree"] if item["path"] == row["path"])["sha"] = (
+                    "0" * 40
+                )
                 with (
                     patch.object(
                         publish_distribution,
@@ -417,10 +416,8 @@ class PublicationTests(unittest.TestCase):
                     command.return_value.stdout = "a" * 40
                     with self.assertRaisesRegex(ValueError, "Tagged raw"):
                         publish_distribution.publish(self.index_path)
-                    self.assertFalse(
-                        any(call.kwargs.get("body") for call in api.call_args_list)
-                    )
-                    self.assertEqual(command.call_count, 1)
+                    self.assertFalse(any(call.kwargs.get("body") for call in api.call_args_list))
+                    self.assertEqual(command.call_count, 2)
 
 
 if __name__ == "__main__":

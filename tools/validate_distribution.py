@@ -184,9 +184,11 @@ def prices(package, values, membership, *, price_identity=None):
     manifest = package["manifest"]
     context = manifest["context"]
     require(
-        manifest["release_id"] == (
+        manifest["release_id"]
+        == (
             catalogue_checksum(semantic_price(manifest))
-            if price_identity is None else price_identity(manifest)
+            if price_identity is None
+            else price_identity(manifest)
         ),
         "Price release identity mismatch",
     )
@@ -237,6 +239,61 @@ def prices(package, values, membership, *, price_identity=None):
     )
 
 
+def metadata_delta(package, values, snapshot, target):
+    """Check delta rows and complete reference replacements against the full target."""
+    manifest, full_manifest = package["manifest"], snapshot["manifest"]
+    require(
+        manifest["mode"] == "delta"
+        and manifest.get("base_release_id")
+        and manifest["base_release_id"] != full_manifest["release_id"]
+        and all(
+            manifest[key] == full_manifest[key]
+            for key in (
+                "release_id",
+                "content_revision",
+                "product_count",
+                "recipe_count",
+                "generated_at",
+            )
+        )
+        and manifest.get("rules_revision", "1") == full_manifest.get("rules_revision", "1"),
+        "Delta targets a different full snapshot",
+    )
+    changed = metadata(package, values)
+    for field, identity, removed in (
+        ("products", "product_id", "removed_product_ids"),
+        ("recipes", "recipe_id", "removed_recipe_ids"),
+    ):
+        full = {row[identity]: row for row in target.get(field, [])}
+        rows, removals = changed.get(field, []), changed.get(removed, [])
+        keys = [row[identity] for row in rows]
+        require(
+            len(set(keys)) == len(keys)
+            and all(row == full.get(row[identity]) for row in rows)
+            and len(set(removals)) == len(removals)
+            and all(key not in full for key in removals),
+            f"Delta {field} differs from its full target",
+        )
+    for field, identity in (
+        ("nutrition_references", "reference_id"),
+        ("ingredient_profiles", "measure_profile_id"),
+        ("product_profiles", "product_measure_profile_id"),
+        ("ingredient_nutrition", "ingredient_id"),
+        ("substitution_rules", "rule_id"),
+    ):
+        rows = changed.get(field, [])
+        require(
+            len({row[identity] for row in rows}) == len(rows) and rows == target.get(field, []),
+            f"Delta {field} replacement differs from full target",
+        )
+    for field in ("app_categories", "ingredient_taxonomy"):
+        require(
+            changed.get(field) is not None and changed[field] == target[field],
+            f"Delta {field} replacement differs from full target",
+        )
+    return changed
+
+
 def validate(index_path, schema_path=ROOT / "schema/catalogue-distribution-v1.json"):
     require(index_path.stat().st_size <= 2 * 1024 * 1024, "Index byte budget exceeded")
     index = json.loads(index_path.read_text(encoding="utf-8"))
@@ -276,9 +333,11 @@ def validate(index_path, schema_path=ROOT / "schema/catalogue-distribution-v1.js
             ),
             "Delta target differs from complete snapshot",
         )
-        metadata(
+        metadata_delta(
             index["delta"],
             pages(directory, index["delta"]["archive"], validators["catalogue_page"]),
+            index["snapshot"],
+            combined,
         )
     contexts = set()
     for package in index["prices"]:
