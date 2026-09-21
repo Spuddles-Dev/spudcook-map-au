@@ -10,3 +10,8 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.bak
+
+# Python validation tooling
+__pycache__/
+*.pyc
+.venv/

@@ -9,3 +9,4 @@
 
 # JSON data files
 *.json text
+*.zip binary
