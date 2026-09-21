@@ -3,7 +3,7 @@ name: Validate and publish public data
 on:
   push:
     branches: [main]
-    paths: ['distribution/candidate-release.json', 'distribution/*.zip', 'schema/**', 'tools/**', '.github/workflows/distribute-data.yml']
+    paths: ['distribution/candidate-release.json', 'distribution/*.zip', 'distribution/v2/candidate-food.json', 'distribution/v2/*.zip', 'distribution/v2/prices/candidate-*.json', 'distribution/v2/prices/*.zip', 'schema/**', 'tools/**', '.github/workflows/distribute-data.yml']
   pull_request:
     paths: ['distribution/**', 'schema/**', 'tools/**', '.github/workflows/distribute-data.yml']
   workflow_dispatch:
@@ -26,7 +26,11 @@ jobs:
       - run: python -m pip install -r tools/requirements.txt
       - run: python -m unittest discover -s tools/tests -v
       - name: Validate candidate ZIPs and typed pages
+        if: github.event_name == 'pull_request'
         run: python tools/validate_distribution.py
+      - name: Validate independent stream candidates
+        if: github.event_name == 'pull_request'
+        run: python tools/validate_streams.py
 
   publish:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -44,3 +48,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python tools/publish_distribution.py
+      - name: Publish independent food and vendor streams
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/publish_streams.py

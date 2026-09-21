@@ -180,11 +180,14 @@ def metadata(package, values):
     return combined
 
 
-def prices(package, values, membership):
+def prices(package, values, membership, *, price_identity=None):
     manifest = package["manifest"]
     context = manifest["context"]
     require(
-        manifest["release_id"] == catalogue_checksum(semantic_price(manifest)),
+        manifest["release_id"] == (
+            catalogue_checksum(semantic_price(manifest))
+            if price_identity is None else price_identity(manifest)
+        ),
         "Price release identity mismatch",
     )
     require(

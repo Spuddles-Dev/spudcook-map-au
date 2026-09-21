@@ -27,17 +27,13 @@ def api(path, *, body=None, missing=False, method="POST", conflict=False):
         with tempfile.TemporaryDirectory() as directory:
             file = Path(directory) / "request.json"
             file.write_text(json.dumps(body), encoding="utf-8")
-            result = command(
-                *args, "--method", method, "--input", str(file), check=False
-            )
+            result = command(*args, "--method", method, "--input", str(file), check=False)
     if result.returncode:
         if missing and "HTTP 404" in result.stderr:
             return None
         if conflict and any(f"HTTP {code}" in result.stderr for code in (409, 422)):
             return None
-        raise RuntimeError(
-            "GitHub API operation failed; the public pointer was not advanced"
-        )
+        raise RuntimeError("GitHub API operation failed; the public pointer was not advanced")
     return json.loads(result.stdout)
 
 
@@ -46,8 +42,7 @@ def verify_release(release, expected):
     require(set(actual) == set(expected), "Release assets are incomplete or unexpected")
     for name, (size, digest) in expected.items():
         require(
-            actual[name]["size"] == size
-            and actual[name].get("digest") == "sha256:" + digest,
+            actual[name]["size"] == size and actual[name].get("digest") == "sha256:" + digest,
             "GitHub asset digest/size mismatch",
         )
 
@@ -69,19 +64,20 @@ def find_release(tag):
     raise ValueError("Release discovery exceeded its bounded page budget")
 
 
-def verify_tagged_files(tag, index_path, index):
+def verify_tagged_files(
+    tag, index_path, index, *, asset_specs=None, relative_directory="distribution"
+):
     tree = api("git/trees/" + tag + "?recursive=1")
     require(not tree.get("truncated"), "Cannot verify a truncated Git tree")
     entries = {item["path"]: item for item in tree["tree"] if item["type"] == "blob"}
     paths = [index_path] + [
-        index_path.parent / asset["path"] for asset in assets(index)
+        index_path.parent / asset["path"]
+        for asset in (assets(index) if asset_specs is None else asset_specs)
     ]
     for path in paths:
         raw = path.read_bytes()
-        git_digest = hashlib.sha1(
-            b"blob " + str(len(raw)).encode() + b"\0" + raw
-        ).hexdigest()
-        relative = "distribution/" + path.name
+        git_digest = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+        relative = relative_directory + "/" + path.name
         row = entries.get(relative, {})
         require(
             row.get("sha") == git_digest and row.get("size") == len(raw),
@@ -89,15 +85,19 @@ def verify_tagged_files(tag, index_path, index):
         )
 
 
-def advance_pointer(tag, raw):
+def advance_pointer(
+    tag,
+    raw,
+    *,
+    candidate_path="distribution/candidate-release.json",
+    pointer_path="distribution/catalogue-release.json",
+):
     result = {"release_tag": tag, "published": True, "pointer_advanced": False}
     head = api("git/ref/heads/main")["object"]["sha"]
-    candidate = api("contents/distribution/candidate-release.json?ref=" + head)
+    candidate = api("contents/" + candidate_path + "?ref=" + head)
     if base64.b64decode(candidate["content"]) != raw:
         return {**result, "reason": "newer_candidate_on_main"}
-    current = api(
-        "contents/distribution/catalogue-release.json?ref=" + head, missing=True
-    )
+    current = api("contents/" + pointer_path + "?ref=" + head, missing=True)
     if current and base64.b64decode(current["content"]) == raw:
         return {**result, "reason": "already_current"}
     base = api("git/commits/" + head)["tree"]["sha"]
@@ -111,7 +111,7 @@ def advance_pointer(tag, raw):
             "base_tree": base,
             "tree": [
                 {
-                    "path": "distribution/catalogue-release.json",
+                    "path": pointer_path,
                     "mode": "100644",
                     "type": "blob",
                     "sha": blob["sha"],
@@ -145,18 +145,51 @@ def advance_pointer(tag, raw):
     return {**result, "pointer_advanced": True}
 
 
-def publish(index_path):
+def advance_pointer_with_retry(tag, raw, **paths):
+    for _ in range(3):
+        result = advance_pointer(tag, raw, **paths)
+        if result.get("reason") != "main_changed_during_publication":
+            return result
+    # No force update: surface a retryable failure so an interrupted pointer
+    # advance is visible instead of reporting a completely published stream.
+    raise RuntimeError("Main changed during each pointer attempt; rerun publication")
+
+
+def publish(
+    index_path,
+    *,
+    validated=None,
+    asset_specs=None,
+    candidate_path="distribution/candidate-release.json",
+    pointer_path="distribution/catalogue-release.json",
+    index_asset_name="catalogue-release.json",
+    latest=True,
+):
     require(
         os.environ.get("GITHUB_REPOSITORY", REPOSITORY) == REPOSITORY,
         "Publication is restricted to the public data repository",
     )
-    index = validate(index_path)
+    index = validate(index_path) if validated is None else validated
     raw = index_path.read_bytes()
     tag = index["release_tag"]
     sha = command("git", "-C", str(ROOT), "rev-parse", "HEAD").stdout.strip()
     require(len(sha) == 40, "Expected an exact checked commit")
-    expected = {a["path"]: (a["byte_length"], a["sha256"]) for a in assets(index)}
-    expected["catalogue-release.json"] = (len(raw), hashlib.sha256(raw).hexdigest())
+    selected_assets = assets(index) if asset_specs is None else asset_specs
+    expected = {a["path"]: (a["byte_length"], a["sha256"]) for a in selected_assets}
+    expected[index_asset_name] = (len(raw), hashlib.sha256(raw).hexdigest())
+
+    def verify_tag():
+        if validated is None:
+            verify_tagged_files(tag, index_path, index)
+        else:
+            verify_tagged_files(
+                tag,
+                index_path,
+                index,
+                asset_specs=selected_assets,
+                relative_directory=str(Path(candidate_path).parent).replace("\\", "/"),
+            )
+
     release = find_release(tag)
     if release is None:
         existing_tag = api("git/ref/tags/" + tag, missing=True)
@@ -164,7 +197,7 @@ def publish(index_path):
             api("git/refs", body={"ref": "refs/tags/" + tag, "sha": sha})
         # An interrupted run may have tagged an earlier source commit with
         # identical data. Verify its bytes, never move or replace that tag.
-        verify_tagged_files(tag, index_path, index)
+        verify_tag()
         with tempfile.TemporaryDirectory() as directory:
             notes = Path(directory) / "notes.md"
             notes.write_text(
@@ -195,7 +228,7 @@ def publish(index_path):
         existing = {a["name"]: a for a in release["assets"]}
         require(set(existing) <= set(expected), "Unexpected draft assets")
         with tempfile.TemporaryDirectory() as directory:
-            index_asset = Path(directory) / "catalogue-release.json"
+            index_asset = Path(directory) / index_asset_name
             index_asset.write_bytes(raw)
             for name, (size, digest) in expected.items():
                 if name in existing:
@@ -205,14 +238,10 @@ def publish(index_path):
                         "Existing draft asset differs; refusing overwrite",
                     )
                     continue
-                path = (
-                    index_asset
-                    if name == "catalogue-release.json"
-                    else index_path.parent / name
-                )
+                path = index_asset if name == index_asset_name else index_path.parent / name
                 command("gh", "release", "upload", tag, str(path), "--repo", REPOSITORY)
         verify_release(api(release_path), expected)
-        verify_tagged_files(tag, index_path, index)
+        verify_tag()
         command(
             "gh",
             "release",
@@ -221,22 +250,28 @@ def publish(index_path):
             "--repo",
             REPOSITORY,
             "--draft=false",
-            "--latest",
+            "--latest" if latest else "--latest=false",
         )
     release = api(release_path)
     require(
         not release["draft"] and not release["prerelease"],
         "Current pointer requires a published data release",
     )
+    if validated is not None:
+        require(
+            release.get("immutable") is True, "Stream publication requires release immutability"
+        )
     verify_release(release, expected)
-    verify_tagged_files(tag, index_path, index)
-    return advance_pointer(tag, raw)
+    verify_tag()
+    if validated is None:
+        return advance_pointer_with_retry(tag, raw)
+    return advance_pointer_with_retry(
+        tag, raw, candidate_path=candidate_path, pointer_path=pointer_path
+    )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--index", type=Path, default=ROOT / "distribution/candidate-release.json"
-    )
+    parser.add_argument("--index", type=Path, default=ROOT / "distribution/candidate-release.json")
     args = parser.parse_args()
     print(json.dumps(publish(args.index)))

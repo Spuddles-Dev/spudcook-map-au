@@ -5,9 +5,29 @@ files contain shared published data only, never account records or private
 nutrition corrections. The backend remains the source of truth.
 
 The April `data/` files are historical exports and are not current prices. New
-clients use the version 1 distribution described below.
+clients use the independent version 2 streams. Version 1 remains available for
+older clients.
 
-## Current release and immutable files
+## Independent streams (app build 230 and later)
+
+Discover food through `distribution/v2/food.json` and vendor prices through
+`distribution/v2/prices/{aldi,coles,drakes,iga,woolies}.json` on `main`.
+Each vendor feed contains eight state/territory packages. Food includes published
+nutrition; missing nutrition remains unknown. Price compatibility uses each
+vendor's product membership, so nutrition corrections do not rebuild prices.
+
+Food archives use `food-v2-<hash>` tags under `distribution/v2/`. Price archives
+use **each package's own** `prices-v2-<vendor>-<hash>` tag under
+`distribution/v2/prices/`; unchanged states may retain an older owner tag.
+The same bytes are GitHub Release attachments. Food and vendor release index
+attachments are respectively `food.json` and `<vendor>.json`.
+
+Six independent current pointers advance only after immutable releases are
+verified. A failed stream retains its previous pointer while healthy streams
+advance. Observation dates, snapshot generation and publication remain distinct.
+Apps stage incompatible prices until the required food membership is installed.
+
+## Version 1 compatibility and immutable files
 
 The current pointer is `distribution/catalogue-release.json` on `main`. It is
 created or advanced **only after** its GitHub Release is completely uploaded,
@@ -40,8 +60,8 @@ missing-price outcomes remain explicit; packaging never makes old data fresh.
 ## Publishing
 
 See [the export and publication process](docs/EXPORT_PROCESS.md). The only moving
-public document is the current pointer. `candidate-release.json` is an operator
-staging input, not client discovery. Binary assets live in this repository so
+public documents are the current pointers. Candidate indexes are operator
+staging inputs, not client discovery. Binary assets live in this repository so
 tagged raw downloads work in browsers; GitHub Releases carry the same bytes.
 
 The public workflow runs schema, ZIP, checksum, membership and publication-order

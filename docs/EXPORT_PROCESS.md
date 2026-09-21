@@ -1,5 +1,34 @@
 # Export and publication
 
+## Independent version 2 streams
+
+The backend-owned hourly publisher runs:
+
+```bash
+python backend/scripts/publish_data_release.py --repo /path/to/spudcook-map-au --api-base-url http://127.0.0.1:8000 --feed-version 2 --push
+```
+
+It materializes pending approved food publications, checks scoped source revisions
+and scheduled validity boundaries, then exports only changed contexts. It writes
+`distribution/v2/candidate-food.json` and
+`distribution/v2/prices/candidate-<vendor>.json`. Unchanged runs reuse verified
+receipts without downloading pages, rebuilding archives or uploading releases.
+The version 1 candidate is derived from the same verified packages for older apps.
+
+The public workflow validates and publishes each stream independently with
+`tools/publish_streams.py`. Existing state packages keep their immutable owner
+tags; a new vendor release uploads only packages it owns. All retained assets
+are verified against both published release digests and immutable Git blobs.
+Pointer updates recheck the main head and candidate after contention, with three
+bounded attempts; they never force-push.
+
+Validate locally with `python tools/validate_streams.py`. The generated
+`schema/catalogue-distribution-v2.json` comes from the backend's typed models;
+`tools/feed_integrity.py` mirrors the backend semantic revision specification.
+No GitHub credentials belong in the app or scraper containers.
+
+## Version 1 compatibility export
+
 Use the committed FeedMyBudget monorepo exporter with Python 3.12:
 
 ```bash
