@@ -4,7 +4,7 @@ Public, versioned Feed My Budget catalogue and state/chain price packages. These
 files contain shared published data only, never account records or private
 nutrition corrections. The backend remains the source of truth.
 
-The April `data/` files are historical exports and are not current prices. New
+The `data/` files are historical exports and are not current prices. New
 clients use the independent version 2 streams. Version 1 remains available for
 older clients.
 
@@ -67,3 +67,20 @@ tagged raw downloads work in browsers; GitHub Releases carry the same bytes.
 The public workflow runs schema, ZIP, checksum, membership and publication-order
 tests without backend credentials. Pull requests can validate but cannot publish.
 Source notices and attribution within exported panels must be retained.
+
+## Product identity and future GTIN mappings
+
+Every product retains its retailer `product_id`. Food snapshots already carry
+`barcode`, `gtin_id`, `gtin_verified` and `gtin_revision` so future reviewed
+mappings travel through ordinary snapshots and exact-base deltas. There is no
+separate manually maintained mapping file. Unmapped products remain usable;
+unknown barcodes and identities must not be fabricated.
+
+Read [GTIN mapping semantics](docs/GTIN_MAPPINGS.md) and run
+`python tools/audit_catalogue.py` to verify published files and measure coverage
+per retailer. Publication dates describe packaging, not the age of each product
+fact or price observation. An enabled hourly timer does not guarantee that its
+latest export or public workflow succeeded.
+
+The [15 October 2026 audit](docs/AUDIT_2026-10-15.md) records measured coverage
+and validation evidence for a pinned public release.

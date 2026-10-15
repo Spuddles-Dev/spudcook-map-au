@@ -8,7 +8,20 @@ The backend-owned hourly publisher runs:
 python backend/scripts/publish_data_release.py --repo /path/to/spudcook-map-au --api-base-url http://127.0.0.1:8000 --feed-version 2 --push
 ```
 
-It materializes pending approved food publications, checks scoped source revisions
+The service first runs a separate authenticated preflight:
+
+```bash
+python backend/scripts/materialize_catalogue.py --api-base-url http://127.0.0.1:8000 --admin-key-file "$HOME/.config/fmb/data-publisher.env"
+```
+
+The credential file is an operator-owned mode-0600 file containing only
+`FMB_PUBLISHER_ADMIN_KEY=<existing admin key>`. Keep it outside Git; never put the
+key on the command line. Manual publishers must run this preflight too. The export
+command itself does not materialize approved changes. HTTP 503 means publication
+is busy, still pending, or failed; retain existing pointers and retry after the
+publisher finishes. Do not bypass the check or acknowledge dirty revisions manually.
+
+After a successful preflight, the exporter checks scoped source revisions
 and scheduled validity boundaries, then exports only changed contexts. It writes
 `distribution/v2/candidate-food.json` and
 `distribution/v2/prices/candidate-<vendor>.json`. Unchanged runs reuse verified
@@ -95,9 +108,14 @@ tags are retained and current-candidate validation still passes.
 python -m pip install -r tools/requirements.txt
 python -m unittest discover -s tools/tests -v
 python tools/validate_distribution.py
+python tools/validate_streams.py
+python tools/audit_catalogue.py
 ```
 
 `schema/catalogue-distribution-v1.json` is generated from the monorepo Pydantic
 distribution, catalogue-page and price-page contracts. `tools/catalogue_integrity.py`
 is an exact copy of the shared checksum implementation. Regenerate both when
 those contracts change; do not maintain independent wire DTOs here.
+
+The audit verifies published pointers and archives and measures GTIN coverage.
+See [GTIN mappings](GTIN_MAPPINGS.md).

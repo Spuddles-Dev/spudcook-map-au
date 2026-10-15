@@ -1,117 +1,41 @@
-# CLAUDE.md - spudcook-map-au
+# Repository guidance
 
-This file provides guidance to Claude Code when working with this repository.
+This is the public Australian FeedMyBudget data distribution repository. Source
+code, scrapers, PostgreSQL and editorial review live in the private
+`fmb-monorepo`; this repository contains publication tooling as well as data.
 
-## Overview
+## Current layout
 
-GitHub data repository for Australian grocery data. Acts as a CDN for the FeedMyBudget Flutter app.
+- `distribution/v2/food.json`: published food discovery pointer.
+- `distribution/v2/prices/<vendor>.json`: five vendor pointers, each with eight state/territory packages.
+- `distribution/catalogue-release.json`: version 1 compatibility pointer.
+- `distribution/**/candidate-*.json`: publisher staging inputs.
+- `schema/`: generated monorepo contracts, not independently authored DTOs.
+- `tools/`: validation, immutable-release publication and audit commands.
+- `data/`: historical exports, not current client discovery or current prices.
 
-**Primary Purpose:** Store processed JSON data and thumbnails for efficient app distribution.
+## Publication rules
 
-## This Repo Contains Data Only
+PostgreSQL reviewed publications flow through the API's immutable catalogue and
+the dedicated host publisher. Run authenticated materialization before export.
+Only the public workflow advances pointers after verifying complete immutable
+releases. Never edit GTIN facts, pointers or archives by hand, replace tagged
+bytes, or force-push. Keep credentials, account data, private photos, review
+drafts and correction queues out of this repository.
 
-This repository contains:
-- Processed product data (gzipped JSON)
-- Current specials data (gzipped JSON)
-- Product thumbnails (JPG images)
-- Manifest file for app sync
+Product IDs use `woolies_`, `coles_`, `aldi_`, `iga_` and `drakes_` prefixes.
+Keep barcodes as strings, preserving leading zeroes. A barcode or `gtin_id`
+alone does not establish verified shared identity. Unknown mappings stay unknown.
+See [GTIN mappings](docs/GTIN_MAPPINGS.md).
 
-It does NOT contain:
-- Scraper code (see `fmb-backend/scrapers/`)
-- API code (see `fmb-backend/api/`)
-- Flutter app code (see `FeedMyBudget/`)
-
-## Directory Structure
-
-```
-spudcook-map-au/
-├── README.md           # Data format documentation
-├── CLAUDE.md           # This file
-├── docs/
-│   ├── PROGRESS.md     # Data pipeline tasks
-│   └── EXPORT_PROCESS.md
-└── data/
-    ├── manifest.json   # Index for app sync
-    ├── products/       # Product data by store/category
-    │   ├── woolworths/
-    │   ├── coles/
-    │   └── aldi/
-    ├── specials/       # Current specials
-    │   ├── woolworths.json.gz
-    │   ├── coles.json.gz
-    │   └── aldi.json.gz
-    └── thumbnails/     # Product images
-        ├── woolworths/
-        ├── coles/
-        └── aldi/
-```
-
-## Data Format
-
-All JSON files are gzip compressed.
-
-### Product Format
-
-```json
-{
-  "id": "woolworths_123456",
-  "name": "Product Name",
-  "brand": "Brand",
-  "category": "pantry",
-  "price_cents": 499,
-  "unit_price": "4.99/kg",
-  "barcode": "9300000000000",
-  "size": "500g",
-  "image_url": "thumbnails/woolworths/123456.jpg"
-}
-```
-
-### Special Format
-
-```json
-{
-  "product_id": "woolworths_123456",
-  "current_price_cents": 250,
-  "was_price_cents": 499,
-  "discount_percent": 50,
-  "special_type": "half_price",
-  "valid_to": "2026-01-27"
-}
-```
-
-## How Data Gets Here
-
-Data flows from fmb-backend:
-
-```
-fmb-backend scrapers → SQLite DB → export_github.py → This repo
-```
-
-See `docs/EXPORT_PROCESS.md` for details.
-
-## Commands
-
-**There are no commands to run in this repo.** All data management happens in fmb-backend.
-
-To update data:
+## Validation (Python 3.12)
 
 ```bash
-cd ../fmb-backend/scripts
-python export_github.py --all --repo ../spudcook-map-au --push
+python -m pip install -r tools/requirements.txt
+python -m unittest discover -s tools/tests -v
+python tools/validate_distribution.py
+python tools/validate_streams.py
+python tools/audit_catalogue.py
 ```
 
-## Access URLs
-
-```
-https://raw.githubusercontent.com/Spuddles-Dev/spudcook-map-au/main/data/manifest.json
-https://raw.githubusercontent.com/Spuddles-Dev/spudcook-map-au/main/data/products/woolworths/pantry.json.gz
-https://raw.githubusercontent.com/Spuddles-Dev/spudcook-map-au/main/data/specials/woolworths.json.gz
-```
-
-## Related Repositories
-
-| Repo | Purpose |
-|------|---------|
-| `fmb-backend` | Scrapers, API, export scripts |
-| `FeedMyBudget` | Flutter app that consumes this data |
-| `spudcook-map-nz` | NZ data repository (WIP) |
+See [README](README.md) and [publication process](docs/EXPORT_PROCESS.md).

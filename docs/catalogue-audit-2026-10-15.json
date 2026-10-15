@@ -1,0 +1,84 @@
+{
+  "catalogue_release_id": "792da04ad59f4e97a16a2c160b178477",
+  "food_release_tag": "food-v2-73c58ab886c814b98c53143b595e9bf82811f97442707aa9e15027b40bfb33b9",
+  "product_count": 50371,
+  "retailers": {
+    "aldi": {
+      "linked_gtin": 622,
+      "not_verified": 2309,
+      "products": 2309,
+      "verified": 0,
+      "verified_without_link": 0,
+      "with_barcode": 3,
+      "without_gtin_link": 1687
+    },
+    "coles": {
+      "linked_gtin": 11002,
+      "not_verified": 13154,
+      "products": 13154,
+      "verified": 0,
+      "verified_without_link": 0,
+      "with_barcode": 1702,
+      "without_gtin_link": 2152
+    },
+    "drakes": {
+      "linked_gtin": 25,
+      "not_verified": 13050,
+      "products": 13050,
+      "verified": 0,
+      "verified_without_link": 0,
+      "with_barcode": 0,
+      "without_gtin_link": 13025
+    },
+    "iga": {
+      "linked_gtin": 8690,
+      "not_verified": 10330,
+      "products": 10330,
+      "verified": 0,
+      "verified_without_link": 0,
+      "with_barcode": 66,
+      "without_gtin_link": 1640
+    },
+    "woolies": {
+      "linked_gtin": 11524,
+      "not_verified": 11527,
+      "products": 11528,
+      "verified": 1,
+      "verified_without_link": 0,
+      "with_barcode": 11528,
+      "without_gtin_link": 4
+    }
+  },
+  "streams": {
+    "aldi": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-14T14:03:16.095535Z",
+      "release_tag": "prices-v2-aldi-e3e9c053146bdc9749bc22a6b70508fe42cba0f4e46ff185d7499158cc38fc1f"
+    },
+    "coles": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-15T09:02:18.027067Z",
+      "release_tag": "prices-v2-coles-dbd863a27e70289fa5360e05f946ce74aa33ccd5bddfad31ec2f0e822e879990"
+    },
+    "drakes": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-14T14:03:24.016905Z",
+      "release_tag": "prices-v2-drakes-353d2fcfc96cee0c96431191d777f01b89352825d4c6a79ee2679f62ed593b68"
+    },
+    "food": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-08T00:01:48.982811Z",
+      "release_tag": "food-v2-73c58ab886c814b98c53143b595e9bf82811f97442707aa9e15027b40bfb33b9"
+    },
+    "iga": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-14T14:03:36.851646Z",
+      "release_tag": "prices-v2-iga-dff9583eb30bf612ea63128f004dd56c1c3c337205a60d2f9c9dd3ad755c16cc"
+    },
+    "woolies": {
+      "candidate_matches_current": true,
+      "published_at": "2026-10-13T14:04:02.733001Z",
+      "release_tag": "prices-v2-woolies-8f71583b74523714a20245c34a66d227e16aae809a25943a61dbcc441b1744fb"
+    }
+  }
+}
