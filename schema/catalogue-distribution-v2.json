@@ -1157,6 +1157,31 @@
             "title": "Diets",
             "type": "object"
           },
+          "ingredients_reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Reviewed At"
+          },
+          "ingredients_source_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Source Revision"
+          },
           "ingredients_text": {
             "anyOf": [
               {
@@ -1168,6 +1193,18 @@
             ],
             "default": null,
             "title": "Ingredients Text"
+          },
+          "ingredients_verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Verified"
           },
           "nutrition": {
             "anyOf": [
@@ -1524,6 +1561,19 @@
             ],
             "default": null,
             "title": "Reference Food Id"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reviewed At"
           },
           "salt_g": {
             "anyOf": [

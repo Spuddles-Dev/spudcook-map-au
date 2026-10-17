@@ -1,351 +1,4 @@
 {
-  "index": {
-    "$defs": {
-      "CatalogueDistributionAsset": {
-        "additionalProperties": false,
-        "properties": {
-          "path": {
-            "maxLength": 160,
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*\\.zip$",
-            "title": "Path",
-            "type": "string"
-          },
-          "sha256": {
-            "pattern": "^[a-f0-9]{64}$",
-            "title": "Sha256",
-            "type": "string"
-          },
-          "byte_length": {
-            "exclusiveMinimum": 0,
-            "maximum": 67108864,
-            "title": "Byte Length",
-            "type": "integer"
-          },
-          "uncompressed_bytes": {
-            "exclusiveMinimum": 0,
-            "maximum": 536870912,
-            "title": "Uncompressed Bytes",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "path",
-          "sha256",
-          "byte_length",
-          "uncompressed_bytes"
-        ],
-        "title": "CatalogueDistributionAsset",
-        "type": "object"
-      },
-      "CatalogueDistributionPackage": {
-        "additionalProperties": false,
-        "properties": {
-          "manifest": {
-            "$ref": "#/$defs/CatalogueManifestResponse"
-          },
-          "archive": {
-            "$ref": "#/$defs/CatalogueDistributionAsset"
-          }
-        },
-        "required": [
-          "manifest",
-          "archive"
-        ],
-        "title": "CatalogueDistributionPackage",
-        "type": "object"
-      },
-      "CatalogueDistributionPricePackage": {
-        "additionalProperties": false,
-        "properties": {
-          "manifest": {
-            "$ref": "#/$defs/CataloguePriceManifest"
-          },
-          "archive": {
-            "$ref": "#/$defs/CatalogueDistributionAsset"
-          },
-          "base_release_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Base Release Id"
-          },
-          "delta_archive": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/CatalogueDistributionAsset"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          }
-        },
-        "required": [
-          "manifest",
-          "archive"
-        ],
-        "title": "CatalogueDistributionPricePackage",
-        "type": "object"
-      },
-      "CatalogueManifestResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "json_bytes": {
-            "default": 0,
-            "description": "Exact UTF-8 page JSON bytes before HTTP compression",
-            "minimum": 0,
-            "title": "Json Bytes",
-            "type": "integer"
-          },
-          "gzip_bytes_estimate": {
-            "default": 0,
-            "description": "Estimated gzip-compressed page bytes; actual HTTP encoding may differ",
-            "minimum": 0,
-            "title": "Gzip Bytes Estimate",
-            "type": "integer"
-          },
-          "contract_version": {
-            "default": 1,
-            "maximum": 1,
-            "minimum": 1,
-            "title": "Contract Version",
-            "type": "integer"
-          },
-          "release_id": {
-            "title": "Release Id",
-            "type": "string"
-          },
-          "base_release_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Base Release Id"
-          },
-          "mode": {
-            "enum": [
-              "snapshot",
-              "delta"
-            ],
-            "title": "Mode",
-            "type": "string"
-          },
-          "generated_at": {
-            "format": "date-time",
-            "title": "Generated At",
-            "type": "string"
-          },
-          "rules_revision": {
-            "default": "1",
-            "title": "Rules Revision",
-            "type": "string"
-          },
-          "product_count": {
-            "minimum": 0,
-            "title": "Product Count",
-            "type": "integer"
-          },
-          "recipe_count": {
-            "minimum": 0,
-            "title": "Recipe Count",
-            "type": "integer"
-          },
-          "page_count": {
-            "minimum": 1,
-            "title": "Page Count",
-            "type": "integer"
-          },
-          "page_checksums": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Page Checksums",
-            "type": "array"
-          },
-          "content_revision": {
-            "title": "Content Revision",
-            "type": "string"
-          }
-        },
-        "required": [
-          "release_id",
-          "mode",
-          "generated_at",
-          "product_count",
-          "recipe_count",
-          "page_count",
-          "page_checksums",
-          "content_revision"
-        ],
-        "title": "CatalogueManifestResponse",
-        "type": "object"
-      },
-      "CataloguePriceManifest": {
-        "additionalProperties": false,
-        "properties": {
-          "contract_version": {
-            "default": 1,
-            "maximum": 1,
-            "minimum": 1,
-            "title": "Contract Version",
-            "type": "integer"
-          },
-          "release_id": {
-            "title": "Release Id",
-            "type": "string"
-          },
-          "context": {
-            "$ref": "#/$defs/CataloguePriceRequest"
-          },
-          "generated_at": {
-            "format": "date-time",
-            "title": "Generated At",
-            "type": "string"
-          },
-          "product_count": {
-            "minimum": 0,
-            "title": "Product Count",
-            "type": "integer"
-          },
-          "page_count": {
-            "minimum": 1,
-            "title": "Page Count",
-            "type": "integer"
-          },
-          "page_checksums": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Page Checksums",
-            "type": "array"
-          }
-        },
-        "required": [
-          "release_id",
-          "context",
-          "generated_at",
-          "product_count",
-          "page_count",
-          "page_checksums"
-        ],
-        "title": "CataloguePriceManifest",
-        "type": "object"
-      },
-      "CataloguePriceRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "catalogue_release_id": {
-            "maxLength": 80,
-            "pattern": "^[a-zA-Z0-9_-]+$",
-            "title": "Catalogue Release Id",
-            "type": "string"
-          },
-          "state": {
-            "title": "State",
-            "type": "string"
-          },
-          "store_code": {
-            "title": "Store Code",
-            "type": "string"
-          },
-          "store_id": {
-            "anyOf": [
-              {
-                "maxLength": 80,
-                "pattern": "^[a-zA-Z0-9_-]+$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Store Id"
-          }
-        },
-        "required": [
-          "catalogue_release_id",
-          "state",
-          "store_code"
-        ],
-        "title": "CataloguePriceRequest",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "properties": {
-      "format_version": {
-        "default": 1,
-        "maximum": 1,
-        "minimum": 1,
-        "title": "Format Version",
-        "type": "integer"
-      },
-      "data_revision": {
-        "pattern": "^[a-f0-9]{64}$",
-        "title": "Data Revision",
-        "type": "string"
-      },
-      "release_tag": {
-        "pattern": "^data-v1-[a-f0-9]{64}$",
-        "title": "Release Tag",
-        "type": "string"
-      },
-      "published_at": {
-        "format": "date-time",
-        "title": "Published At",
-        "type": "string"
-      },
-      "minimum_app_build": {
-        "default": 1,
-        "minimum": 1,
-        "title": "Minimum App Build",
-        "type": "integer"
-      },
-      "snapshot": {
-        "$ref": "#/$defs/CatalogueDistributionPackage"
-      },
-      "delta": {
-        "anyOf": [
-          {
-            "$ref": "#/$defs/CatalogueDistributionPackage"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null
-      },
-      "prices": {
-        "items": {
-          "$ref": "#/$defs/CatalogueDistributionPricePackage"
-        },
-        "maxItems": 40,
-        "title": "Prices",
-        "type": "array"
-      }
-    },
-    "required": [
-      "data_revision",
-      "release_tag",
-      "published_at",
-      "snapshot"
-    ],
-    "title": "CatalogueDistributionIndex",
-    "type": "object"
-  },
   "catalogue_page": {
     "$defs": {
       "AppCategoryGroup": {
@@ -358,15 +11,6 @@
           "code": {
             "title": "Code",
             "type": "string"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "sort_order": {
-            "default": 0,
-            "title": "Sort Order",
-            "type": "integer"
           },
           "dietary_flags": {
             "items": {
@@ -381,6 +25,15 @@
             },
             "title": "Items",
             "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
           }
         },
         "required": [
@@ -402,6 +55,13 @@
             "title": "Code",
             "type": "string"
           },
+          "dietary_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dietary Flags",
+            "type": "array"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -410,13 +70,6 @@
             "default": 0,
             "title": "Sort Order",
             "type": "integer"
-          },
-          "dietary_flags": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Dietary Flags",
-            "type": "array"
           }
         },
         "required": [
@@ -438,15 +91,6 @@
             "title": "Code",
             "type": "string"
           },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "sort_order": {
-            "default": 0,
-            "title": "Sort Order",
-            "type": "integer"
-          },
           "dietary_flags": {
             "items": {
               "type": "string"
@@ -460,6 +104,15 @@
             },
             "title": "Groups",
             "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
           }
         },
         "required": [
@@ -495,12 +148,12 @@
       "CatalogueNutritionReference": {
         "additionalProperties": false,
         "properties": {
+          "nutrition": {
+            "$ref": "#/$defs/ProductNutritionRecord"
+          },
           "reference_id": {
             "title": "Reference Id",
             "type": "string"
-          },
-          "nutrition": {
-            "$ref": "#/$defs/ProductNutritionRecord"
           }
         },
         "required": [
@@ -513,12 +166,58 @@
       "CataloguePageContent": {
         "additionalProperties": false,
         "properties": {
+          "app_categories": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/AppCategoryTree"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "ingredient_nutrition": {
+            "items": {
+              "$ref": "#/$defs/IngredientNutritionReference"
+            },
+            "maxItems": 500,
+            "title": "Ingredient Nutrition",
+            "type": "array"
+          },
+          "ingredient_profiles": {
+            "items": {
+              "$ref": "#/$defs/IngredientMeasureProfile"
+            },
+            "maxItems": 500,
+            "title": "Ingredient Profiles",
+            "type": "array"
+          },
+          "ingredient_taxonomy": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/IngredientTaxonomy"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "nutrition_references": {
             "items": {
               "$ref": "#/$defs/CatalogueNutritionReference"
             },
             "maxItems": 500,
             "title": "Nutrition References",
+            "type": "array"
+          },
+          "product_profiles": {
+            "items": {
+              "$ref": "#/$defs/ProductMeasureProfile"
+            },
+            "maxItems": 500,
+            "title": "Product Profiles",
             "type": "array"
           },
           "products": {
@@ -553,52 +252,6 @@
             "title": "Removed Recipe Ids",
             "type": "array"
           },
-          "app_categories": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/AppCategoryTree"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
-          "ingredient_taxonomy": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/IngredientTaxonomy"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
-          "ingredient_profiles": {
-            "items": {
-              "$ref": "#/$defs/IngredientMeasureProfile"
-            },
-            "maxItems": 500,
-            "title": "Ingredient Profiles",
-            "type": "array"
-          },
-          "product_profiles": {
-            "items": {
-              "$ref": "#/$defs/ProductMeasureProfile"
-            },
-            "maxItems": 500,
-            "title": "Product Profiles",
-            "type": "array"
-          },
-          "ingredient_nutrition": {
-            "items": {
-              "$ref": "#/$defs/IngredientNutritionReference"
-            },
-            "maxItems": 500,
-            "title": "Ingredient Nutrition",
-            "type": "array"
-          },
           "substitution_rules": {
             "items": {
               "$ref": "#/$defs/CuratedIngredientSubstitution"
@@ -614,25 +267,6 @@
       "CuratedIngredientSubstitution": {
         "additionalProperties": false,
         "properties": {
-          "rule_id": {
-            "title": "Rule Id",
-            "type": "integer"
-          },
-          "revision": {
-            "minimum": 1,
-            "title": "Revision",
-            "type": "integer"
-          },
-          "source_ingredient_id": {
-            "minimum": 1,
-            "title": "Source Ingredient Id",
-            "type": "integer"
-          },
-          "replacement_ingredient_id": {
-            "minimum": 1,
-            "title": "Replacement Ingredient Id",
-            "type": "integer"
-          },
           "contexts": {
             "items": {
               "type": "string"
@@ -642,6 +276,18 @@
             "title": "Contexts",
             "type": "array"
           },
+          "from_unit_code": {
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "From Unit Code",
+            "type": "string"
+          },
+          "notes": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Notes",
+            "type": "string"
+          },
           "preparation_basis": {
             "enum": [
               "as_sold",
@@ -650,22 +296,15 @@
             "title": "Preparation Basis",
             "type": "string"
           },
-          "from_unit_code": {
-            "maxLength": 30,
-            "minLength": 1,
-            "title": "From Unit Code",
-            "type": "string"
-          },
-          "to_unit_code": {
-            "maxLength": 30,
-            "minLength": 1,
-            "title": "To Unit Code",
-            "type": "string"
-          },
           "quantity_factor": {
             "exclusiveMinimum": 0.0,
             "title": "Quantity Factor",
             "type": "number"
+          },
+          "replacement_ingredient_id": {
+            "minimum": 1,
+            "title": "Replacement Ingredient Id",
+            "type": "integer"
           },
           "requirements": {
             "items": {
@@ -675,10 +314,24 @@
             "title": "Requirements",
             "type": "array"
           },
-          "notes": {
-            "maxLength": 2000,
+          "revision": {
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "integer"
+          },
+          "source_ingredient_id": {
+            "minimum": 1,
+            "title": "Source Ingredient Id",
+            "type": "integer"
+          },
+          "to_unit_code": {
+            "maxLength": 30,
             "minLength": 1,
-            "title": "Notes",
+            "title": "To Unit Code",
             "type": "string"
           }
         },
@@ -700,9 +353,28 @@
       "IngredientMeasureProfile": {
         "additionalProperties": false,
         "properties": {
-          "measure_profile_id": {
-            "title": "Measure Profile Id",
-            "type": "integer"
+          "base_quantity_per_count": {
+            "exclusiveMinimum": 0.0,
+            "title": "Base Quantity Per Count",
+            "type": "number"
+          },
+          "base_unit_code": {
+            "title": "Base Unit Code",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "count_unit_code": {
+            "title": "Count Unit Code",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
           },
           "generic_item_id": {
             "anyOf": [
@@ -728,39 +400,18 @@
             "default": null,
             "title": "Ingredient Id"
           },
+          "is_default": {
+            "default": false,
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "measure_profile_id": {
+            "title": "Measure Profile Id",
+            "type": "integer"
+          },
           "profile_slug": {
             "title": "Profile Slug",
             "type": "string"
-          },
-          "display_name": {
-            "title": "Display Name",
-            "type": "string"
-          },
-          "count_unit_code": {
-            "title": "Count Unit Code",
-            "type": "string"
-          },
-          "base_quantity_per_count": {
-            "exclusiveMinimum": 0.0,
-            "title": "Base Quantity Per Count",
-            "type": "number"
-          },
-          "base_unit_code": {
-            "title": "Base Unit Code",
-            "type": "string"
-          },
-          "range_min_quantity": {
-            "anyOf": [
-              {
-                "exclusiveMinimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Range Min Quantity"
           },
           "range_max_quantity": {
             "anyOf": [
@@ -775,10 +426,23 @@
             "default": null,
             "title": "Range Max Quantity"
           },
-          "is_default": {
-            "default": false,
-            "title": "Is Default",
-            "type": "boolean"
+          "range_min_quantity": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Range Min Quantity"
+          },
+          "sample_count": {
+            "minimum": 1,
+            "title": "Sample Count",
+            "type": "integer"
           },
           "source_label": {
             "title": "Source Label",
@@ -795,17 +459,6 @@
             ],
             "default": null,
             "title": "Source Url"
-          },
-          "confidence": {
-            "maximum": 1.0,
-            "minimum": 0.0,
-            "title": "Confidence",
-            "type": "number"
-          },
-          "sample_count": {
-            "minimum": 1,
-            "title": "Sample Count",
-            "type": "integer"
           },
           "updated_at": {
             "format": "date-time",
@@ -881,10 +534,6 @@
             "title": "Category Id",
             "type": "integer"
           },
-          "slug": {
-            "title": "Slug",
-            "type": "string"
-          },
           "display_name": {
             "title": "Display Name",
             "type": "string"
@@ -900,6 +549,10 @@
             ],
             "default": null,
             "title": "Icon"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
           },
           "sort_order": {
             "default": 0,
@@ -918,25 +571,25 @@
       "IngredientTaxonomySubcategory": {
         "additionalProperties": false,
         "properties": {
-          "subcategory_id": {
-            "title": "Subcategory Id",
-            "type": "integer"
-          },
           "category_id": {
             "title": "Category Id",
             "type": "integer"
-          },
-          "slug": {
-            "title": "Slug",
-            "type": "string"
           },
           "display_name": {
             "title": "Display Name",
             "type": "string"
           },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
           "sort_order": {
             "default": 0,
             "title": "Sort Order",
+            "type": "integer"
+          },
+          "subcategory_id": {
+            "title": "Subcategory Id",
             "type": "integer"
           }
         },
@@ -952,27 +605,6 @@
       "IngredientTaxonomyVariant": {
         "additionalProperties": false,
         "properties": {
-          "ingredient_variant_id": {
-            "title": "Ingredient Variant Id",
-            "type": "integer"
-          },
-          "subcategory_id": {
-            "title": "Subcategory Id",
-            "type": "integer"
-          },
-          "slug": {
-            "title": "Slug",
-            "type": "string"
-          },
-          "display_name": {
-            "title": "Display Name",
-            "type": "string"
-          },
-          "sort_order": {
-            "default": 0,
-            "title": "Sort Order",
-            "type": "integer"
-          },
           "aliases": {
             "anyOf": [
               {
@@ -987,6 +619,27 @@
             ],
             "default": null,
             "title": "Aliases"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "ingredient_variant_id": {
+            "title": "Ingredient Variant Id",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
+          },
+          "subcategory_id": {
+            "title": "Subcategory Id",
+            "type": "integer"
           }
         },
         "required": [
@@ -1001,23 +654,148 @@
       "ProductCatalogueItem": {
         "additionalProperties": false,
         "properties": {
-          "product_id": {
-            "title": "Product Id",
-            "type": "string"
-          },
-          "food_facts": {
+          "app_category_code": {
             "anyOf": [
               {
-                "$ref": "#/$defs/ProductFoodFacts"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null
+            "default": null,
+            "title": "App Category Code"
           },
-          "name": {
-            "title": "Name",
+          "app_category_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "App Category Id"
+          },
+          "app_category_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "App Category Name"
+          },
+          "availability_observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Availability Observed On"
+          },
+          "availability_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Availability Reason"
+          },
+          "availability_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Availability State"
+          },
+          "availability_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "available",
+                  "unavailable",
+                  "not_listed",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Availability Status"
+          },
+          "availability_store_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Availability Store Id"
+          },
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Barcode"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Brand"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
+          },
+          "currency_code": {
+            "default": "AUD",
+            "title": "Currency Code",
             "type": "string"
           },
           "description": {
@@ -1032,10 +810,40 @@
             "default": null,
             "title": "Description"
           },
-          "gtin_verified": {
-            "default": false,
-            "title": "Gtin Verified",
-            "type": "boolean"
+          "food_facts": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProductFoodFacts"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "generic_item_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Generic Item Id"
+          },
+          "gtin_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Gtin Id"
           },
           "gtin_revision": {
             "anyOf": [
@@ -1050,69 +858,10 @@
             "default": null,
             "title": "Gtin Revision"
           },
-          "app_category_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "App Category Id"
-          },
-          "app_category_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "App Category Code"
-          },
-          "app_category_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "App Category Name"
-          },
-          "brand": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Brand"
-          },
-          "store_code": {
-            "title": "Store Code",
-            "type": "string"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Category"
+          "gtin_verified": {
+            "default": false,
+            "title": "Gtin Verified",
+            "type": "boolean"
           },
           "image_url": {
             "anyOf": [
@@ -1125,6 +874,95 @@
             ],
             "default": null,
             "title": "Image Url"
+          },
+          "ingredient_measure_profile": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/IngredientMeasureProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "ingredient_variant_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredient Variant Id"
+          },
+          "ingredient_variant_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredient Variant Slug"
+          },
+          "is_available": {
+            "default": true,
+            "title": "Is Available",
+            "type": "boolean"
+          },
+          "is_special": {
+            "default": false,
+            "title": "Is Special",
+            "type": "boolean"
+          },
+          "items_per_package": {
+            "anyOf": [
+              {
+                "minimum": 2,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Items Per Package"
+          },
+          "last_updated": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Last Updated"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Source observation date for the price, not its publication time.",
+            "title": "Observed On"
           },
           "package_description": {
             "anyOf": [
@@ -1163,101 +1001,6 @@
             "default": null,
             "title": "Package Unit Code"
           },
-          "items_per_package": {
-            "anyOf": [
-              {
-                "minimum": 2,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Items Per Package"
-          },
-          "gtin_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Gtin Id"
-          },
-          "barcode": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Barcode"
-          },
-          "generic_item_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Generic Item Id"
-          },
-          "ingredient_variant_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Ingredient Variant Id"
-          },
-          "ingredient_variant_slug": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Ingredient Variant Slug"
-          },
-          "ingredient_measure_profile": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/IngredientMeasureProfile"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
-          "product_measure_profile": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/ProductMeasureProfile"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
           "price_cents": {
             "anyOf": [
               {
@@ -1271,107 +1014,6 @@
             "default": null,
             "title": "Price Cents"
           },
-          "was_price_cents": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Was Price Cents"
-          },
-          "savings_cents": {
-            "default": 0,
-            "minimum": 0,
-            "title": "Savings Cents",
-            "type": "integer"
-          },
-          "currency_code": {
-            "default": "AUD",
-            "title": "Currency Code",
-            "type": "string"
-          },
-          "is_special": {
-            "default": false,
-            "title": "Is Special",
-            "type": "boolean"
-          },
-          "is_available": {
-            "default": true,
-            "title": "Is Available",
-            "type": "boolean"
-          },
-          "availability_status": {
-            "anyOf": [
-              {
-                "enum": [
-                  "available",
-                  "unavailable",
-                  "not_listed",
-                  "unknown"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Availability Status"
-          },
-          "availability_reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Availability Reason"
-          },
-          "availability_observed_on": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Availability Observed On"
-          },
-          "availability_state": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Availability State"
-          },
-          "availability_store_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Availability Store Id"
-          },
           "price_source": {
             "anyOf": [
               {
@@ -1384,58 +1026,20 @@
             "default": null,
             "title": "Price Source"
           },
-          "source_state": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Source State"
+          "product_id": {
+            "title": "Product Id",
+            "type": "string"
           },
-          "last_updated": {
+          "product_measure_profile": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "$ref": "#/$defs/ProductMeasureProfile"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "title": "Last Updated"
-          },
-          "observed_on": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Source observation date for the price, not its publication time.",
-            "title": "Observed On"
-          },
-          "special_observed_on": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Source observation date for the special flag; may differ from the price date.",
-            "title": "Special Observed On"
+            "default": null
           },
           "published_at": {
             "anyOf": [
@@ -1451,6 +1055,42 @@
             "description": "Database publication time of the row supplying the price.",
             "title": "Published At"
           },
+          "savings_cents": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Savings Cents",
+            "type": "integer"
+          },
+          "source_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source State"
+          },
+          "special_observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Source observation date for the special flag; may differ from the price date.",
+            "title": "Special Observed On"
+          },
+          "store_code": {
+            "title": "Store Code",
+            "type": "string"
+          },
           "valid_until": {
             "anyOf": [
               {
@@ -1464,6 +1104,19 @@
             "default": null,
             "description": "Unknown unless explicit retailer validity is available; never inferred from a weekly cycle.",
             "title": "Valid Until"
+          },
+          "was_price_cents": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Was Price Cents"
           }
         },
         "required": [
@@ -1477,6 +1130,93 @@
       "ProductFoodFacts": {
         "additionalProperties": false,
         "properties": {
+          "allergens": {
+            "additionalProperties": {
+              "enum": [
+                "contains",
+                "may_contain",
+                "absent",
+                "unknown",
+                "conflicting"
+              ],
+              "type": "string"
+            },
+            "title": "Allergens",
+            "type": "object"
+          },
+          "diets": {
+            "additionalProperties": {
+              "enum": [
+                "compatible",
+                "incompatible",
+                "unknown",
+                "conflicting"
+              ],
+              "type": "string"
+            },
+            "title": "Diets",
+            "type": "object"
+          },
+          "ingredients_reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Reviewed At"
+          },
+          "ingredients_source_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Source Revision"
+          },
+          "ingredients_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Text"
+          },
+          "ingredients_verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ingredients Verified"
+          },
+          "nutrition": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProductNutritionRecord"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "nutrition_reference_id": {
             "anyOf": [
               {
@@ -1519,56 +1259,6 @@
             "default": null,
             "title": "Source Label"
           },
-          "ingredients_text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Ingredients Text"
-          },
-          "allergens": {
-            "additionalProperties": {
-              "enum": [
-                "contains",
-                "may_contain",
-                "absent",
-                "unknown",
-                "conflicting"
-              ],
-              "type": "string"
-            },
-            "title": "Allergens",
-            "type": "object"
-          },
-          "diets": {
-            "additionalProperties": {
-              "enum": [
-                "compatible",
-                "incompatible",
-                "unknown",
-                "conflicting"
-              ],
-              "type": "string"
-            },
-            "title": "Diets",
-            "type": "object"
-          },
-          "nutrition": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/ProductNutritionRecord"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
           "updated_at": {
             "anyOf": [
               {
@@ -1593,12 +1283,19 @@
       "ProductMeasureProfile": {
         "additionalProperties": false,
         "properties": {
-          "product_measure_profile_id": {
-            "title": "Product Measure Profile Id",
-            "type": "integer"
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
           },
-          "product_id": {
-            "title": "Product Id",
+          "count_quantity": {
+            "exclusiveMinimum": 0.0,
+            "title": "Count Quantity",
+            "type": "number"
+          },
+          "count_unit_code": {
+            "title": "Count Unit Code",
             "type": "string"
           },
           "ingredient_measure_profile_id": {
@@ -1613,13 +1310,13 @@
             "default": null,
             "title": "Ingredient Measure Profile Id"
           },
-          "count_quantity": {
-            "exclusiveMinimum": 0.0,
-            "title": "Count Quantity",
-            "type": "number"
+          "is_exact": {
+            "default": false,
+            "title": "Is Exact",
+            "type": "boolean"
           },
-          "count_unit_code": {
-            "title": "Count Unit Code",
+          "package_fingerprint": {
+            "title": "Package Fingerprint",
             "type": "string"
           },
           "package_quantity": {
@@ -1631,9 +1328,13 @@
             "title": "Package Unit Code",
             "type": "string"
           },
-          "package_fingerprint": {
-            "title": "Package Fingerprint",
+          "product_id": {
+            "title": "Product Id",
             "type": "string"
+          },
+          "product_measure_profile_id": {
+            "title": "Product Measure Profile Id",
+            "type": "integer"
           },
           "source_label": {
             "title": "Source Label",
@@ -1651,16 +1352,10 @@
             "default": null,
             "title": "Source Url"
           },
-          "confidence": {
-            "maximum": 1.0,
-            "minimum": 0.0,
-            "title": "Confidence",
-            "type": "number"
-          },
-          "is_exact": {
-            "default": false,
-            "title": "Is Exact",
-            "type": "boolean"
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
           },
           "verified_at": {
             "anyOf": [
@@ -1674,11 +1369,6 @@
             ],
             "default": null,
             "title": "Verified At"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
           }
         },
         "required": [
@@ -1699,13 +1389,6 @@
       "ProductNutritionRecord": {
         "additionalProperties": false,
         "properties": {
-          "qualified_values": {
-            "additionalProperties": {
-              "$ref": "#/$defs/QualifiedNutritionValue"
-            },
-            "title": "Qualified Values",
-            "type": "object"
-          },
           "basis": {
             "enum": [
               "per_100_g",
@@ -1715,10 +1398,161 @@
             "title": "Basis",
             "type": "string"
           },
-          "serving_size": {
+          "calcium_mg": {
             "anyOf": [
               {
-                "maxLength": 100,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Calcium Mg"
+          },
+          "carbohydrates_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Carbohydrates G"
+          },
+          "cholesterol_mg": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cholesterol Mg"
+          },
+          "energy_kcal": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Energy Kcal"
+          },
+          "energy_kj": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Energy Kj"
+          },
+          "fat_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fat G"
+          },
+          "fibre_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fibre G"
+          },
+          "iron_mg": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Iron Mg"
+          },
+          "is_estimate": {
+            "default": false,
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "potassium_mg": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Potassium Mg"
+          },
+          "preparation_basis": {
+            "default": "unknown",
+            "enum": [
+              "as_sold",
+              "prepared",
+              "unknown"
+            ],
+            "title": "Preparation Basis",
+            "type": "string"
+          },
+          "protein_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Protein G"
+          },
+          "qualified_values": {
+            "additionalProperties": {
+              "$ref": "#/$defs/QualifiedNutritionValue"
+            },
+            "title": "Qualified Values",
+            "type": "object"
+          },
+          "reference_food_id": {
+            "anyOf": [
+              {
                 "type": "string"
               },
               {
@@ -1726,7 +1560,46 @@
               }
             ],
             "default": null,
-            "title": "Serving Size"
+            "title": "Reference Food Id"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reviewed At"
+          },
+          "salt_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Salt G"
+          },
+          "saturated_fat_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Saturated Fat G"
           },
           "serving_quantity": {
             "anyOf": [
@@ -1740,6 +1613,19 @@
             ],
             "default": null,
             "title": "Serving Quantity"
+          },
+          "serving_size": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Serving Size"
           },
           "serving_unit_code": {
             "anyOf": [
@@ -1758,16 +1644,6 @@
             "default": null,
             "title": "Serving Unit Code"
           },
-          "preparation_basis": {
-            "default": "unknown",
-            "enum": [
-              "as_sold",
-              "prepared",
-              "unknown"
-            ],
-            "title": "Preparation Basis",
-            "type": "string"
-          },
           "servings_per_package": {
             "anyOf": [
               {
@@ -1780,123 +1656,6 @@
             ],
             "default": null,
             "title": "Servings Per Package"
-          },
-          "energy_kj": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Energy Kj"
-          },
-          "energy_kcal": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Energy Kcal"
-          },
-          "protein_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Protein G"
-          },
-          "carbohydrates_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Carbohydrates G"
-          },
-          "sugars_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Sugars G"
-          },
-          "fat_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Fat G"
-          },
-          "saturated_fat_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Saturated Fat G"
-          },
-          "trans_fat_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Trans Fat G"
-          },
-          "fibre_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Fibre G"
           },
           "sodium_mg": {
             "anyOf": [
@@ -1911,20 +1670,40 @@
             "default": null,
             "title": "Sodium Mg"
           },
-          "salt_g": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
+          "source_kind": {
+            "default": "packaged",
+            "enum": [
+              "packaged",
+              "afcd",
+              "user"
             ],
-            "default": null,
-            "title": "Salt G"
+            "title": "Source Kind",
+            "type": "string"
           },
-          "cholesterol_mg": {
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "source_notices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Source Notices",
+            "type": "object"
+          },
+          "source_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Revision"
+          },
+          "sugars_g": {
             "anyOf": [
               {
                 "minimum": 0.0,
@@ -1935,7 +1714,25 @@
               }
             ],
             "default": null,
-            "title": "Cholesterol Mg"
+            "title": "Sugars G"
+          },
+          "trans_fat_g": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Trans Fat G"
+          },
+          "verified": {
+            "default": false,
+            "title": "Verified",
+            "type": "boolean"
           },
           "vitamin_a_mcg": {
             "anyOf": [
@@ -1988,100 +1785,6 @@
             ],
             "default": null,
             "title": "Vitamin E Mg"
-          },
-          "calcium_mg": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Calcium Mg"
-          },
-          "iron_mg": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Iron Mg"
-          },
-          "potassium_mg": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Potassium Mg"
-          },
-          "source_label": {
-            "title": "Source Label",
-            "type": "string"
-          },
-          "verified": {
-            "default": false,
-            "title": "Verified",
-            "type": "boolean"
-          },
-          "source_kind": {
-            "default": "packaged",
-            "enum": [
-              "packaged",
-              "afcd",
-              "user"
-            ],
-            "title": "Source Kind",
-            "type": "string"
-          },
-          "source_revision": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Source Revision"
-          },
-          "reference_food_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Reference Food Id"
-          },
-          "is_estimate": {
-            "default": false,
-            "title": "Is Estimate",
-            "type": "boolean"
-          },
-          "source_notices": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "title": "Source Notices",
-            "type": "object"
           }
         },
         "required": [
@@ -2121,48 +1824,9 @@
       "SystemRecipeDetail": {
         "additionalProperties": false,
         "properties": {
-          "recipe_id": {
-            "title": "Recipe Id",
-            "type": "integer"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "source": {
+          "calories": {
             "anyOf": [
               {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Source"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Description"
-          },
-          "servings": {
-            "default": 4,
-            "minimum": 1,
-            "title": "Servings",
-            "type": "integer"
-          },
-          "prep_time_minutes": {
-            "anyOf": [
-              {
-                "minimum": 0,
                 "type": "integer"
               },
               {
@@ -2170,7 +1834,31 @@
               }
             ],
             "default": null,
-            "title": "Prep Time Minutes"
+            "title": "Calories"
+          },
+          "carbohydrates": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Carbohydrates"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
           },
           "cook_time_minutes": {
             "anyOf": [
@@ -2185,62 +1873,6 @@
             "default": null,
             "title": "Cook Time Minutes"
           },
-          "wait_time_minutes": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Wait Time Minutes"
-          },
-          "calories": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Calories"
-          },
-          "protein": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Protein"
-          },
-          "tags": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Tags",
-            "type": "array"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Category"
-          },
           "cuisine": {
             "anyOf": [
               {
@@ -2253,13 +1885,7 @@
             "default": null,
             "title": "Cuisine"
           },
-          "ingredient_count": {
-            "default": 0,
-            "minimum": 0,
-            "title": "Ingredient Count",
-            "type": "integer"
-          },
-          "instructions": {
+          "description": {
             "anyOf": [
               {
                 "type": "string"
@@ -2269,7 +1895,7 @@
               }
             ],
             "default": null,
-            "title": "Instructions"
+            "title": "Description"
           },
           "fat": {
             "anyOf": [
@@ -2283,6 +1909,76 @@
             "default": null,
             "title": "Fat"
           },
+          "fiber": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fiber"
+          },
+          "ingredient_count": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Ingredient Count",
+            "type": "integer"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/$defs/SystemRecipeIngredient"
+            },
+            "title": "Ingredients",
+            "type": "array"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Instructions"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "prep_time_minutes": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Prep Time Minutes"
+          },
+          "protein": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Protein"
+          },
+          "recipe_id": {
+            "title": "Recipe Id",
+            "type": "integer"
+          },
           "saturated_fat": {
             "anyOf": [
               {
@@ -2295,29 +1991,23 @@
             "default": null,
             "title": "Saturated Fat"
           },
-          "carbohydrates": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Carbohydrates"
+          "servings": {
+            "default": 4,
+            "minimum": 1,
+            "title": "Servings",
+            "type": "integer"
           },
-          "fiber": {
+          "source": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
             "default": null,
-            "title": "Fiber"
+            "title": "Source"
           },
           "sugar": {
             "anyOf": [
@@ -2331,12 +2021,25 @@
             "default": null,
             "title": "Sugar"
           },
-          "ingredients": {
+          "tags": {
             "items": {
-              "$ref": "#/$defs/SystemRecipeIngredient"
+              "type": "string"
             },
-            "title": "Ingredients",
+            "title": "Tags",
             "type": "array"
+          },
+          "wait_time_minutes": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wait Time Minutes"
           }
         },
         "required": [
@@ -2353,10 +2056,6 @@
             "title": "Ingredient Id",
             "type": "integer"
           },
-          "raw_text": {
-            "title": "Raw Text",
-            "type": "string"
-          },
           "ingredient_name": {
             "anyOf": [
               {
@@ -2368,6 +2067,40 @@
             ],
             "default": null,
             "title": "Ingredient Name"
+          },
+          "is_optional": {
+            "default": false,
+            "title": "Is Optional",
+            "type": "boolean"
+          },
+          "is_section_header": {
+            "default": false,
+            "title": "Is Section Header",
+            "type": "boolean"
+          },
+          "match_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Match Confidence"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
           },
           "quantity": {
             "anyOf": [
@@ -2381,6 +2114,15 @@
             "default": null,
             "title": "Quantity"
           },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
+          },
           "unit_code": {
             "anyOf": [
               {
@@ -2392,18 +2134,6 @@
             ],
             "default": null,
             "title": "Unit Code"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Notes"
           },
           "variant_id": {
             "anyOf": [
@@ -2428,33 +2158,6 @@
             ],
             "default": null,
             "title": "Variant Name"
-          },
-          "match_confidence": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Match Confidence"
-          },
-          "sort_order": {
-            "default": 0,
-            "title": "Sort Order",
-            "type": "integer"
-          },
-          "is_section_header": {
-            "default": false,
-            "title": "Is Section Header",
-            "type": "boolean"
-          },
-          "is_optional": {
-            "default": false,
-            "title": "Is Optional",
-            "type": "boolean"
           }
         },
         "required": [
@@ -2467,10 +2170,6 @@
     },
     "additionalProperties": false,
     "properties": {
-      "release_id": {
-        "title": "Release Id",
-        "type": "string"
-      },
       "base_release_id": {
         "anyOf": [
           {
@@ -2482,6 +2181,13 @@
         ],
         "default": null,
         "title": "Base Release Id"
+      },
+      "checksum": {
+        "title": "Checksum",
+        "type": "string"
+      },
+      "content": {
+        "$ref": "#/$defs/CataloguePageContent"
       },
       "mode": {
         "enum": [
@@ -2496,12 +2202,9 @@
         "title": "Page Number",
         "type": "integer"
       },
-      "checksum": {
-        "title": "Checksum",
+      "release_id": {
+        "title": "Release Id",
         "type": "string"
-      },
-      "content": {
-        "$ref": "#/$defs/CataloguePageContent"
       }
     },
     "required": [
@@ -2514,50 +2217,381 @@
     "title": "CataloguePageResponse",
     "type": "object"
   },
-  "price_page": {
+  "index": {
     "$defs": {
-      "CurrentPrice": {
+      "CatalogueDistributionAsset": {
         "additionalProperties": false,
         "properties": {
-          "product_id": {
-            "title": "Product Id",
-            "type": "string"
-          },
-          "store_code": {
-            "title": "Store Code",
-            "type": "string"
-          },
-          "price_cents": {
-            "minimum": 0,
-            "title": "Price Cents",
+          "byte_length": {
+            "exclusiveMinimum": 0,
+            "maximum": 67108864,
+            "title": "Byte Length",
             "type": "integer"
           },
-          "was_price_cents": {
+          "path": {
+            "maxLength": 160,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*\\.zip$",
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "uncompressed_bytes": {
+            "exclusiveMinimum": 0,
+            "maximum": 536870912,
+            "title": "Uncompressed Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "byte_length",
+          "uncompressed_bytes"
+        ],
+        "title": "CatalogueDistributionAsset",
+        "type": "object"
+      },
+      "CatalogueDistributionPackage": {
+        "additionalProperties": false,
+        "properties": {
+          "archive": {
+            "$ref": "#/$defs/CatalogueDistributionAsset"
+          },
+          "manifest": {
+            "$ref": "#/$defs/CatalogueManifestResponse"
+          }
+        },
+        "required": [
+          "manifest",
+          "archive"
+        ],
+        "title": "CatalogueDistributionPackage",
+        "type": "object"
+      },
+      "CatalogueDistributionPricePackage": {
+        "additionalProperties": false,
+        "properties": {
+          "archive": {
+            "$ref": "#/$defs/CatalogueDistributionAsset"
+          },
+          "base_release_id": {
             "anyOf": [
               {
-                "minimum": 0,
-                "type": "integer"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
             "default": null,
-            "title": "Was Price Cents"
+            "title": "Base Release Id"
           },
-          "savings_cents": {
-            "minimum": 0,
-            "title": "Savings Cents",
-            "type": "integer"
+          "delta_archive": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/CatalogueDistributionAsset"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
-          "currency_code": {
-            "default": "AUD",
-            "title": "Currency Code",
+          "manifest": {
+            "$ref": "#/$defs/CataloguePriceManifest"
+          }
+        },
+        "required": [
+          "manifest",
+          "archive"
+        ],
+        "title": "CatalogueDistributionPricePackage",
+        "type": "object"
+      },
+      "CatalogueManifestResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "base_release_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Base Release Id"
+          },
+          "content_revision": {
+            "title": "Content Revision",
             "type": "string"
           },
-          "is_special": {
-            "title": "Is Special",
-            "type": "boolean"
+          "contract_version": {
+            "default": 1,
+            "maximum": 1,
+            "minimum": 1,
+            "title": "Contract Version",
+            "type": "integer"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "gzip_bytes_estimate": {
+            "default": 0,
+            "description": "Estimated gzip-compressed page bytes; actual HTTP encoding may differ",
+            "minimum": 0,
+            "title": "Gzip Bytes Estimate",
+            "type": "integer"
+          },
+          "json_bytes": {
+            "default": 0,
+            "description": "Exact UTF-8 page JSON bytes before HTTP compression",
+            "minimum": 0,
+            "title": "Json Bytes",
+            "type": "integer"
+          },
+          "mode": {
+            "enum": [
+              "snapshot",
+              "delta"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "page_checksums": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Page Checksums",
+            "type": "array"
+          },
+          "page_count": {
+            "minimum": 1,
+            "title": "Page Count",
+            "type": "integer"
+          },
+          "product_count": {
+            "minimum": 0,
+            "title": "Product Count",
+            "type": "integer"
+          },
+          "recipe_count": {
+            "minimum": 0,
+            "title": "Recipe Count",
+            "type": "integer"
+          },
+          "release_id": {
+            "title": "Release Id",
+            "type": "string"
+          },
+          "rules_revision": {
+            "default": "1",
+            "title": "Rules Revision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "release_id",
+          "mode",
+          "generated_at",
+          "product_count",
+          "recipe_count",
+          "page_count",
+          "page_checksums",
+          "content_revision"
+        ],
+        "title": "CatalogueManifestResponse",
+        "type": "object"
+      },
+      "CataloguePriceManifest": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/$defs/CataloguePriceRequest"
+          },
+          "contract_version": {
+            "default": 1,
+            "maximum": 1,
+            "minimum": 1,
+            "title": "Contract Version",
+            "type": "integer"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "page_checksums": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Page Checksums",
+            "type": "array"
+          },
+          "page_count": {
+            "minimum": 1,
+            "title": "Page Count",
+            "type": "integer"
+          },
+          "product_count": {
+            "minimum": 0,
+            "title": "Product Count",
+            "type": "integer"
+          },
+          "release_id": {
+            "title": "Release Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "release_id",
+          "context",
+          "generated_at",
+          "product_count",
+          "page_count",
+          "page_checksums"
+        ],
+        "title": "CataloguePriceManifest",
+        "type": "object"
+      },
+      "CataloguePriceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "catalogue_release_id": {
+            "maxLength": 80,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Catalogue Release Id",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "store_code": {
+            "title": "Store Code",
+            "type": "string"
+          },
+          "store_id": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "pattern": "^[a-zA-Z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Store Id"
+          }
+        },
+        "required": [
+          "catalogue_release_id",
+          "state",
+          "store_code"
+        ],
+        "title": "CataloguePriceRequest",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "data_revision": {
+        "pattern": "^[a-f0-9]{64}$",
+        "title": "Data Revision",
+        "type": "string"
+      },
+      "delta": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/CatalogueDistributionPackage"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "format_version": {
+        "default": 1,
+        "maximum": 1,
+        "minimum": 1,
+        "title": "Format Version",
+        "type": "integer"
+      },
+      "minimum_app_build": {
+        "default": 1,
+        "minimum": 1,
+        "title": "Minimum App Build",
+        "type": "integer"
+      },
+      "prices": {
+        "items": {
+          "$ref": "#/$defs/CatalogueDistributionPricePackage"
+        },
+        "maxItems": 40,
+        "title": "Prices",
+        "type": "array"
+      },
+      "published_at": {
+        "format": "date-time",
+        "title": "Published At",
+        "type": "string"
+      },
+      "release_tag": {
+        "pattern": "^data-v1-[a-f0-9]{64}$",
+        "title": "Release Tag",
+        "type": "string"
+      },
+      "snapshot": {
+        "$ref": "#/$defs/CatalogueDistributionPackage"
+      }
+    },
+    "required": [
+      "data_revision",
+      "release_tag",
+      "published_at",
+      "snapshot"
+    ],
+    "title": "CatalogueDistributionIndex",
+    "type": "object"
+  },
+  "price_page": {
+    "$defs": {
+      "CurrentPrice": {
+        "additionalProperties": false,
+        "properties": {
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Barcode"
+          },
+          "cup_measure": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cup Measure"
           },
           "cup_price_cents": {
             "anyOf": [
@@ -2572,7 +2606,12 @@
             "default": null,
             "title": "Cup Price Cents"
           },
-          "cup_measure": {
+          "currency_code": {
+            "default": "AUD",
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "gtin_brand": {
             "anyOf": [
               {
                 "type": "string"
@@ -2582,19 +2621,39 @@
               }
             ],
             "default": null,
-            "title": "Cup Measure"
+            "title": "Gtin Brand"
+          },
+          "gtin_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Gtin Id"
+          },
+          "gtin_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Gtin Name"
           },
           "is_available": {
             "title": "Is Available",
             "type": "boolean"
           },
-          "price_source": {
-            "title": "Price Source",
-            "type": "string"
-          },
-          "source_state": {
-            "title": "Source State",
-            "type": "string"
+          "is_special": {
+            "title": "Is Special",
+            "type": "boolean"
           },
           "last_updated": {
             "format": "date-time",
@@ -2615,19 +2674,18 @@
             "description": "Source observation date for the price; no precise observation time is recorded.",
             "title": "Observed On"
           },
-          "special_observed_on": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Source observation date for the special flag, which may come from a different row.",
-            "title": "Special Observed On"
+          "price_cents": {
+            "minimum": 0,
+            "title": "Price Cents",
+            "type": "integer"
+          },
+          "price_source": {
+            "title": "Price Source",
+            "type": "string"
+          },
+          "product_id": {
+            "title": "Product Id",
+            "type": "string"
           },
           "published_at": {
             "anyOf": [
@@ -2643,6 +2701,33 @@
             "description": "Database publication time of the row supplying the price; not an observation time.",
             "title": "Published At"
           },
+          "savings_cents": {
+            "minimum": 0,
+            "title": "Savings Cents",
+            "type": "integer"
+          },
+          "source_state": {
+            "title": "Source State",
+            "type": "string"
+          },
+          "special_observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Source observation date for the special flag, which may come from a different row.",
+            "title": "Special Observed On"
+          },
+          "store_code": {
+            "title": "Store Code",
+            "type": "string"
+          },
           "valid_until": {
             "anyOf": [
               {
@@ -2657,9 +2742,10 @@
             "description": "Unknown unless explicit retailer validity is available; never inferred from a weekly cycle.",
             "title": "Valid Until"
           },
-          "gtin_id": {
+          "was_price_cents": {
             "anyOf": [
               {
+                "minimum": 0,
                 "type": "integer"
               },
               {
@@ -2667,43 +2753,7 @@
               }
             ],
             "default": null,
-            "title": "Gtin Id"
-          },
-          "barcode": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Barcode"
-          },
-          "gtin_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Gtin Name"
-          },
-          "gtin_brand": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Gtin Brand"
+            "title": "Was Price Cents"
           }
         },
         "required": [
@@ -2723,14 +2773,17 @@
       "CurrentPricesResponse": {
         "additionalProperties": false,
         "properties": {
-          "state": {
-            "title": "State",
-            "type": "string"
-          },
           "currency_code": {
             "default": "AUD",
             "title": "Currency Code",
             "type": "string"
+          },
+          "not_found": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Not Found",
+            "type": "array"
           },
           "prices": {
             "additionalProperties": {
@@ -2739,12 +2792,9 @@
             "title": "Prices",
             "type": "object"
           },
-          "not_found": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Not Found",
-            "type": "array"
+          "state": {
+            "title": "State",
+            "type": "string"
           }
         },
         "required": [
@@ -2758,14 +2808,21 @@
     },
     "additionalProperties": false,
     "properties": {
-      "release_id": {
-        "title": "Release Id",
+      "checksum": {
+        "title": "Checksum",
         "type": "string"
+      },
+      "content": {
+        "$ref": "#/$defs/CurrentPricesResponse"
       },
       "page_number": {
         "minimum": 0,
         "title": "Page Number",
         "type": "integer"
+      },
+      "release_id": {
+        "title": "Release Id",
+        "type": "string"
       },
       "requested_ids": {
         "items": {
@@ -2774,13 +2831,6 @@
         "maxItems": 500,
         "title": "Requested Ids",
         "type": "array"
-      },
-      "checksum": {
-        "title": "Checksum",
-        "type": "string"
-      },
-      "content": {
-        "$ref": "#/$defs/CurrentPricesResponse"
       }
     },
     "required": [
